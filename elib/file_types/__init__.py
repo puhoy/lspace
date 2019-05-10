@@ -8,3 +8,5 @@ def get_file_type_class(path):
 
     if file_extension in ['.pdf']:
         return PDF
+    
+    

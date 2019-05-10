@@ -13,6 +13,8 @@ from elib.file_types._base import FileTypeBase
 
 
 class PDF(FileTypeBase):
+    extenstion = '.pdf'
+    
     def __init__(self, path):
         super().__init__(path)
 

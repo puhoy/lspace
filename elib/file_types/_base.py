@@ -1,6 +1,7 @@
+import hashlib
+import logging
 import os
 import string
-import logging
 
 import isbnlib
 
@@ -20,6 +21,13 @@ class FileTypeBase:
 
     def get_year(self):
         return None
+
+    def get_md5(self):
+        with open(self.path, 'rb') as file_to_check:
+            data = file_to_check.read()
+            md5sum = hashlib.md5(data).hexdigest()
+        logging.debug('md5 is %s' % md5sum)
+        return md5sum
 
     def find_in_db(self):
         # based on isbns from text

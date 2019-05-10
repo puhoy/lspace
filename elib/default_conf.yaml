@@ -1,0 +1,7 @@
+
+
+database: sqlite:///{APP_DIR}/elib.db
+library_path: ~/library
+
+file_format: '{AUTHORS}/{TITLE}'
+loglevel: INFO
