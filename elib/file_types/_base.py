@@ -22,6 +22,11 @@ class FileTypeBase:
     def get_year(self):
         return None
 
+    @property
+    def filename(self):
+        filename = os.path.split(self.path)[-1]
+        return filename
+
     def get_md5(self):
         with open(self.path, 'rb') as file_to_check:
             data = file_to_check.read()
@@ -57,8 +62,7 @@ class FileTypeBase:
         return []
 
     def _clean_filename(self):
-        filename = os.path.split(self.path)[-1]
-        filename, extension = os.path.splitext(filename)
+        filename, extension = os.path.splitext(self.filename)
 
         whitelist = string.ascii_letters + string.digits + ' '
         clean_filename = ''.join(
@@ -71,13 +75,17 @@ class FileTypeBase:
         results = isbnlib.goom(self._clean_filename())
         logging.info('results: %s' % results)
         return results
-        
 
     def get_metadata_for_isbn(self, isbn):
         try:
-            meta = isbnlib.meta(isbn, service='default', cache='default')
+            meta = isbnlib.meta(isbn, service='openl', cache='default')
         except isbnlib.dev._exceptions.NoDataForSelectorError:
             meta = {}
+        if not meta:
+            try:
+                meta = isbnlib.meta(isbn, service='goob', cache='default')
+            except isbnlib.dev._exceptions.NoDataForSelectorError:
+                meta = {}
         return meta
 
     def _preprocess_isbns(self, isbns):

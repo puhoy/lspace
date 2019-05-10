@@ -4,6 +4,7 @@ import os
 from shutil import copyfile, move
 
 import click
+import isbnlib
 import yaml
 from pick import pick
 from slugify import slugify
@@ -20,6 +21,13 @@ APP_NAME = 'elib'
 CONFIG_FILE = 'config.yaml'
 
 app_dir = click.get_app_dir(APP_NAME)
+
+
+run_search = 'run another query'
+isbn_lookup = 'lookup by isbn'
+specify_manually = 'specify manually'
+skip = 'skip'
+other_choices = [run_search, isbn_lookup, specify_manually, skip]
 
 
 def get_default_config():
@@ -44,6 +52,22 @@ def make_db_session(db_path):
 def cli():
     pass
 
+
+@cli.command()
+@click.argument('dirtyisbn')
+def convert_to_isbn13(dirtyisbn):
+    click.echo(isbnlib.to_isbn13(dirtyisbn))
+
+@cli.command()
+@click.argument('words')
+def find_meta_by_text(words):
+    if isbnlib.is_isbn13:
+        click.echo('%s looks like isbn!' % words)
+        results = isbnlib.meta(words, service='openl')
+    else:
+        results = isbnlib.goom(words)
+    click.echo(yaml.dump(results))
+    
 
 @cli.command()
 def init():
@@ -93,7 +117,8 @@ def _import(document_path, reimport, move):
             click.echo('getting metadata for %s' % path)
 
             isbns_with_metadata = f.find_in_db()
-
+            
+            
             if len(isbns_with_metadata) == 0:
                 choice = False
 
@@ -101,25 +126,61 @@ def _import(document_path, reimport, move):
                 choice = isbns_with_metadata[0]
 
             else:
-                formatted_choices = format_metadata_choices(
-                    isbns_with_metadata)
+                choice = choose_result(f, isbns_with_metadata)
+            
+            while choice in other_choices:
+                if choice == run_search:
+                    search_string = click.prompt('search string')
+                    results = query_google_books(search_string)
+                    
+                elif choice == skip:
+                    continue
+                elif choice == isbn_lookup:
+                    results = lookup_isbn()
 
-                click.echo('found metadata for %s\n' % path)
-                click.echo('\n'.join(formatted_choices))
-
-                ret = click.prompt('', type=click.IntRange(
-                    min=1,
-                    max=len(formatted_choices)))
-
-                idx = ret - 1
-                choice = isbns_with_metadata[idx]
-
+                choice = choose_result(f, results)
+                
             if choice:
                 print(choice)
                 _import(f, choice, config, session, move)
         else:
             click.echo('skipping %s' % path)
 
+def lookup_isbn():
+    isbn_str = click.prompt('specify isbn (without whitespaces, only the number)')
+    if isbnlib.is_isbn10(isbn_str):
+        isbn_str = isbnlib.to_isbn13(isbn_str)
+    try:
+        meta = isbnlib.meta(isbn_str, service='openl', cache='default')
+    except isbnlib.dev._exceptions.NoDataForSelectorError:
+        meta = {}
+    if not meta:
+        try:
+            meta = isbnlib.meta(isbn_str, service='goob', cache='default')
+        except isbnlib.dev._exceptions.NoDataForSelectorError:
+            meta = {}
+    if meta:
+        return [meta]
+    else:
+        return []
+
+def choose_result(file_type_object, isbns_with_metadata):
+    isbns_with_metadata += other_choices
+    formatted_choices = format_metadata_choices(
+        isbns_with_metadata)
+
+    click.echo('\n'.join(formatted_choices))
+
+    ret = click.prompt('choose result for %s' % file_type_object.filename, type=click.IntRange(
+        min=1,
+        max=len(formatted_choices)))
+
+    idx = ret - 1
+    choice = isbns_with_metadata[idx]
+    return choice
+
+def query_google_books(words):
+    return isbnlib.goom(words)
 
 def _import(file_type_object, choice, conf, session, move_file):
     library_path = os.path.abspath(os.path.expanduser(conf['library_path']))
