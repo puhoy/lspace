@@ -9,6 +9,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        lib=elib.cli:cli
+        lib=elib.app:cli_group
     ''',
 )

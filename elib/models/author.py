@@ -2,10 +2,10 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
 
-from . import Base
+from ..app import db
 
 
-class Author(Base):
+class Author(db.Model):
     __tablename__ = 'authors'
     id = Column(Integer, primary_key=True)
     name = Column(String(100))

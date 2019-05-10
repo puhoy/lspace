@@ -1,10 +1,9 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
 
-from . import Base
+from ..app import db
 
-
-class Book(Base):
+class Book(db.Model):
     __tablename__ = 'books'
 
     id = Column(Integer, primary_key=True)

@@ -1,27 +1,19 @@
-
 import logging
 import os
-from shutil import copyfile, move
 
 import click
 import isbnlib
-import yaml
-from pick import pick
 from slugify import slugify
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from shutil import move, copyfile
+import yaml
 
-from .file_types import get_file_type_class
-from .models import Base
-from .models.author import Author
-from .models.book import Book
-from .models.book_author_association import book_author_association_table
+from ..file_types import get_file_type_class
+from ..helpers import read_config
+from ..models.author import Author
+from ..models.book import Book
+from . import cli
 
-APP_NAME = 'elib'
-CONFIG_FILE = 'config.yaml'
-
-app_dir = click.get_app_dir(APP_NAME)
-
+from ..app import db
 
 run_search = 'run another query'
 isbn_lookup = 'lookup by isbn'
@@ -30,95 +22,27 @@ skip = 'skip'
 other_choices = [run_search, isbn_lookup, specify_manually, skip]
 
 
-def get_default_config():
-    this_dir = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(this_dir, 'default_conf.yaml'), 'r') as default_config_file:
-        default_config = yaml.load(default_config_file)
-        default_config['database'] = default_config['database'].format(APP_DIR=app_dir)
-    return default_config
-
-
-def make_db_session(db_path):
-    engine = create_engine(db_path, echo=True)
-    Session = sessionmaker(bind=engine)
-
-    logging.info('creating engine...')
-    Base.metadata.create_all(engine)
-
-    return Session()
-
-
-@click.group()
-def cli():
-    pass
-
-
-@cli.command()
-@click.argument('dirtyisbn')
-def convert_to_isbn13(dirtyisbn):
-    click.echo(isbnlib.to_isbn13(dirtyisbn))
-
-@cli.command()
-@click.argument('words')
-def find_meta_by_text(words):
-    if isbnlib.is_isbn13:
-        click.echo('%s looks like isbn!' % words)
-        results = isbnlib.meta(words, service='openl')
-    else:
-        results = isbnlib.goom(words)
-    click.echo(yaml.dump(results))
-    
-
-@cli.command()
-def init():
-    os.makedirs(app_dir, exist_ok=True)
-    config_path = os.path.join(app_dir, CONFIG_FILE)
-    if os.path.exists(config_path):
-        click.prompt('config exists - override?',
-                     default=False, confirmation_prompt=True)
-
-    default_config = get_default_config()
-    with open(config_path, 'w') as config:
-        yaml.dump(default_config, config)
-
-
-def read_config():
-    config_path = os.path.join(app_dir, CONFIG_FILE)
-    with open(config_path, 'r') as config:
-        conf = yaml.load(config)
-
-    conf = {**get_default_config(), **conf}
-
-    loglevel = logging._nameToLevel[conf.get('loglevel', 'INFO')]
-    logging.basicConfig(format='%(asctime)s - %(message)s',
-                        datefmt='%d-%b-%y %H:%M:%S', level=loglevel)
-
-    session = make_db_session(conf['database'])
-
-    return conf, session
-
 
 @cli.command(name='import')
 @click.argument('document_path', type=click.Path(exists=True), nargs=-1)
 @click.option('--reimport', help='dont check if this file is in the library', default=False, is_flag=True)
 @click.option('--move', help='move imported files instead copying', default=False, is_flag=True)
-def _import(document_path, reimport, move):
-    config, session = read_config()
+def import_command(document_path, reimport, move):
+    config = read_config()
 
     for path in document_path:
 
         file_class = get_file_type_class(path)
         if file_class:
             f = file_class(path)
-            if not reimport and session.query(Book).filter_by(md5sum=f.get_md5()).first():
+            if not reimport and Book.query.filter_by(md5sum=f.get_md5()).first():
                 logging.info('%s already imported, skipping...' % path)
                 continue
 
             click.echo('getting metadata for %s' % path)
 
             isbns_with_metadata = f.find_in_db()
-            
-            
+
             if len(isbns_with_metadata) == 0:
                 choice = False
 
@@ -127,27 +51,29 @@ def _import(document_path, reimport, move):
 
             else:
                 choice = choose_result(f, isbns_with_metadata)
-            
+
             while choice in other_choices:
                 if choice == run_search:
                     search_string = click.prompt('search string')
                     results = query_google_books(search_string)
-                    
+
                 elif choice == skip:
                     continue
                 elif choice == isbn_lookup:
                     results = lookup_isbn()
 
                 choice = choose_result(f, results)
-                
+
             if choice:
                 print(choice)
-                _import(f, choice, config, session, move)
+                _import(f, choice, config, move)
         else:
             click.echo('skipping %s' % path)
 
+
 def lookup_isbn():
-    isbn_str = click.prompt('specify isbn (without whitespaces, only the number)')
+    isbn_str = click.prompt(
+        'specify isbn (without whitespaces, only the number)')
     if isbnlib.is_isbn10(isbn_str):
         isbn_str = isbnlib.to_isbn13(isbn_str)
     try:
@@ -164,6 +90,7 @@ def lookup_isbn():
     else:
         return []
 
+
 def choose_result(file_type_object, isbns_with_metadata):
     isbns_with_metadata += other_choices
     formatted_choices = format_metadata_choices(
@@ -179,10 +106,13 @@ def choose_result(file_type_object, isbns_with_metadata):
     choice = isbns_with_metadata[idx]
     return choice
 
+
 def query_google_books(words):
     return isbnlib.goom(words)
 
-def _import(file_type_object, choice, conf, session, move_file):
+
+
+def _import(file_type_object, choice, conf, move_file):
     library_path = os.path.abspath(os.path.expanduser(conf['library_path']))
     os.makedirs(library_path, exist_ok=True)
 
@@ -222,13 +152,13 @@ def _import(file_type_object, choice, conf, session, move_file):
 
     authors = []
     for author_name in choice['Authors']:
-        author = session.query(Author).filter_by(name=author_name).first()
+        author = Author.query.filter_by(name=author_name).first()
         if not author:
             logging.info('creating %s' % author_name)
             author = Author(name=author_name)
-            session.add(author)
+            db.session.add(author)
         authors.append(author)
-        session.commit()
+        db.session.commit()
 
     title = choice['Title']
     isbn_13 = choice['ISBN-13']
@@ -236,7 +166,7 @@ def _import(file_type_object, choice, conf, session, move_file):
     year = choice['Year']
     language = choice['Language']
 
-    book = session.query(Book).filter_by(isbn_13=isbn_13).first()
+    book = db.session.query(Book).filter_by(isbn_13=isbn_13).first()
     if not book:
         logging.info('adding book %s' % book)
         book = Book(
@@ -248,8 +178,8 @@ def _import(file_type_object, choice, conf, session, move_file):
             md5sum=file_type_object.get_md5(),
             path=path_in_library
         )
-        session.add(book)
-        session.commit()
+        db.session.add(book)
+        db.session.commit()
 
 
 def format_metadata_choices(isbns_with_metadata):
