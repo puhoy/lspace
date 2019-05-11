@@ -1,20 +1,13 @@
-import re
-import string
+
 from typing import List
-
-import isbnlib
 import PyPDF2 as pypdf
-import requests
 
-# pdf = PDF('/home/meatpuppet/ebooks/books/computerei/Beautiful Code.pdf')
-# print(pdf.find_isbn())
-# print(pdf.get_metadata())
 from elib.file_types._base import FileTypeBase
 
 
 class PDF(FileTypeBase):
     extenstion = '.pdf'
-    
+
     def __init__(self, path):
         super().__init__(path)
 
@@ -33,12 +26,20 @@ class PDF(FileTypeBase):
             pages.append(extracted_text)
 
         # if true, there was at least one page with text
-        if True in [True if page else False for page in pages]:
+        if True in [bool(page) for page in pages]:
             return pages
         return []
 
+    def get_isbn(self):
+        meta = self.pdf_reader.getXmpMetadata()
+        # never found a pdf with xmp metadata - not sure what the results would look like
+        #if meta:
+        #    if meta.dc_description:
+        #        print(meta.dc_description)
+        return None
+
     def get_author(self):
-        self.metadata.author
+        return self.metadata.author
 
     def get_title(self):
-        self.metadata.title
+        return self.metadata.title

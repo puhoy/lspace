@@ -2,6 +2,7 @@ import os
 
 import yaml
 import logging
+import isbnlib
 
 from .. import app_dir
 from .. import CONFIG_FILE
@@ -27,3 +28,23 @@ def read_config():
                         datefmt='%d-%b-%y %H:%M:%S', level=loglevel)
 
     return conf
+
+
+
+def query_isbn_data(isbn):
+    if isbnlib.is_isbn10(isbn_str):
+        isbn_str = isbnlib.to_isbn13(isbn_str)
+    try:
+        meta = isbnlib.meta(isbn_str, service='openl', cache='default')
+    except isbnlib.dev._exceptions.NoDataForSelectorError:
+        meta = {}
+    if not meta:
+        try:
+            meta = isbnlib.meta(isbn_str, service='goob', cache='default')
+        except isbnlib.dev._exceptions.NoDataForSelectorError:
+            meta = {}
+    if meta:
+        return [meta]
+    else:
+        return []
+

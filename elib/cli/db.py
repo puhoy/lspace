@@ -3,7 +3,7 @@ from . import cli
 
 from flask_migrate import init, migrate, upgrade
 
-@cli.group(hide)
+@cli.group()
 def db():
     pass
 
@@ -19,4 +19,5 @@ def _migrate():
 
 @db.command(name='upgrade')
 def _upgrade():
+    # todo: automate this based on versions
     upgrade()

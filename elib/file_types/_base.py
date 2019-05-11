@@ -5,6 +5,8 @@ import string
 
 import isbnlib
 
+from ..helpers import query_isbn_data
+
 
 class FileTypeBase:
     def __init__(self, path):
@@ -21,6 +23,9 @@ class FileTypeBase:
 
     def get_year(self):
         return None
+    
+    def get_isbn(self):
+        return None
 
     @property
     def filename(self):
@@ -35,21 +40,25 @@ class FileTypeBase:
         return md5sum
 
     def find_in_db(self):
-        # based on isbns from text
         logging.info('processing %s' % self.path)
+
+        # try isbn from metadata
+        _isbn = self.get_isbn()
+        if _isbn:
+            logging.info('found isbn %s in metadata!' % _isbn)
+
+        # try find isbn in text
         logging.info('getting from text...')
         isbns = self.get_isbns_from_text()
         if isbns:
             isbns_with_metadata = []
             for isbn in isbns:
-                try:
-                    isbns_with_metadata.append(isbnlib.meta(
-                        isbn, service='default', cache='default'))
-                except Exception as e:
-                    logging.error(e, exc_info=True)
+                d = query_isbn_data(isbn)
+                isbns_with_metadata.append(d)
             return isbns_with_metadata
 
-        # if author + title:
+        
+        # try from author + title in metadata:
         logging.info('getting from author + title...')
         if self.get_author() and self.get_title():
             return isbnlib.goom(self._clean_filename())
@@ -71,22 +80,11 @@ class FileTypeBase:
         return clean_filename
 
     def guess_from_filename(self):
-        print('looking for %s' % self._clean_filename())
-        results = isbnlib.goom(self._clean_filename())
+        clean_filename = self._clean_filename()
+        logging.debug('looking for %s' % clean_filename)
+        results = isbnlib.goom(clean_filename)
         logging.info('results: %s' % results)
         return results
-
-    def get_metadata_for_isbn(self, isbn):
-        try:
-            meta = isbnlib.meta(isbn, service='openl', cache='default')
-        except isbnlib.dev._exceptions.NoDataForSelectorError:
-            meta = {}
-        if not meta:
-            try:
-                meta = isbnlib.meta(isbn, service='goob', cache='default')
-            except isbnlib.dev._exceptions.NoDataForSelectorError:
-                meta = {}
-        return meta
 
     def _preprocess_isbns(self, isbns):
         """

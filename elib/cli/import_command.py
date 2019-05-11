@@ -8,7 +8,7 @@ from shutil import move, copyfile
 import yaml
 
 from ..file_types import get_file_type_class
-from ..helpers import read_config
+from ..helpers import read_config, query_isbn_data
 from ..models.author import Author
 from ..models.book import Book
 from . import cli
@@ -35,6 +35,7 @@ def import_command(document_path, reimport, move):
         file_class = get_file_type_class(path)
         if file_class:
             f = file_class(path)
+            
             if not reimport and Book.query.filter_by(md5sum=f.get_md5()).first():
                 logging.info('%s already imported, skipping...' % path)
                 continue
@@ -44,8 +45,9 @@ def import_command(document_path, reimport, move):
             isbns_with_metadata = f.find_in_db()
 
             if len(isbns_with_metadata) == 0:
-                choice = False
-
+                click.echo('could not find any isbn or metadata for %s' % f.filename)
+                choice = choose_result(f, [])
+                
             elif len(isbns_with_metadata) == 1:
                 choice = isbns_with_metadata[0]
 
@@ -53,20 +55,24 @@ def import_command(document_path, reimport, move):
                 choice = choose_result(f, isbns_with_metadata)
 
             while choice in other_choices:
+
                 if choice == run_search:
                     search_string = click.prompt('search string')
                     results = query_google_books(search_string)
 
-                elif choice == skip:
-                    continue
                 elif choice == isbn_lookup:
                     results = lookup_isbn()
 
-                choice = choose_result(f, results)
+                if choice != skip:
+                    choice = choose_result(f, results)
+                else:
+                    choice = False
 
             if choice:
-                print(choice)
                 _import(f, choice, config, move)
+            else:
+                click.echo('could not import %s' % path, color='yellow')
+
         else:
             click.echo('skipping %s' % path)
 
@@ -74,22 +80,7 @@ def import_command(document_path, reimport, move):
 def lookup_isbn():
     isbn_str = click.prompt(
         'specify isbn (without whitespaces, only the number)')
-    if isbnlib.is_isbn10(isbn_str):
-        isbn_str = isbnlib.to_isbn13(isbn_str)
-    try:
-        meta = isbnlib.meta(isbn_str, service='openl', cache='default')
-    except isbnlib.dev._exceptions.NoDataForSelectorError:
-        meta = {}
-    if not meta:
-        try:
-            meta = isbnlib.meta(isbn_str, service='goob', cache='default')
-        except isbnlib.dev._exceptions.NoDataForSelectorError:
-            meta = {}
-    if meta:
-        return [meta]
-    else:
-        return []
-
+    return query_isbn_data(isbn_str)
 
 def choose_result(file_type_object, isbns_with_metadata):
     isbns_with_metadata += other_choices
@@ -168,7 +159,6 @@ def _import(file_type_object, choice, conf, move_file):
 
     book = db.session.query(Book).filter_by(isbn_13=isbn_13).first()
     if not book:
-        logging.info('adding book %s' % book)
         book = Book(
             title=title,
             authors=authors,
@@ -178,6 +168,7 @@ def _import(file_type_object, choice, conf, move_file):
             md5sum=file_type_object.get_md5(),
             path=path_in_library
         )
+        logging.info('adding book %s' % book)
         db.session.add(book)
         db.session.commit()
 

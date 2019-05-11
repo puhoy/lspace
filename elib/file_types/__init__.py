@@ -1,12 +1,17 @@
 import os
 
 from .pdf import PDF
+from .epub import Epub
 
+mapping = {
+        '.pdf': PDF,
+        '.epub': Epub
+}
 
 def get_file_type_class(path):
     filename, file_extension = os.path.splitext(path)
 
-    if file_extension in ['.pdf']:
-        return PDF
+    file_class = mapping.get(file_extension, None)
+    return file_class
     
     
