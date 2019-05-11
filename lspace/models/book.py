@@ -1,9 +1,10 @@
+import os
 
-
-from sqlalchemy import Column, ForeignKey, Integer, String, Table
+from sqlalchemy import Column, Integer, String, Table
 from sqlalchemy.orm import relationship
 
 from ..app import db, whooshee
+from ..config import library_path
 
 @whooshee.register_model('title', 'language', 'isbn13')
 class Book(db.Model):
@@ -22,4 +23,7 @@ class Book(db.Model):
     md5sum = Column(String(32))
     path = Column(String(400))
 
+    @property
+    def full_path(self):
+        return f'{os.path.join(library_path, self.path)}'
 

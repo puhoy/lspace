@@ -8,7 +8,7 @@ from ..helpers import get_default_config
 from . import cli
 
 
-@cli.command()
+@cli.command(help='generate a new config')
 def init():
     os.makedirs(app_dir, exist_ok=True)
     config_path = os.path.join(app_dir, CONFIG_FILE)
@@ -19,3 +19,5 @@ def init():
     default_config = get_default_config()
     with open(config_path, 'w') as config:
         yaml.dump(default_config, config)
+    click.echo('written config file to %s' % config_path)
+    

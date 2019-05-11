@@ -13,7 +13,6 @@ def _init():
 
 @db.command(name='migrate')
 def _migrate():
-    # todo: automate this based on versions
     migrate()
 
 @db.command(name='upgrade')

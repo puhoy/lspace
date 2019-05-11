@@ -61,3 +61,15 @@ def query_google_books(words):
     except isbnlib.dev._exceptions.NoDataForSelectorError as e:
         results = []
     return results
+
+def query_db(query, books=True, authors=True):
+    from ..models import Book, Author
+    if not query:
+        results = Book.query.all()
+    else:
+        results = Book.query.whooshee_search(' '.join(query)).all()
+        author_results = Author.query.whooshee_search(' '.join(query)).all()
+        for author in author_results:
+            for book in author.books:
+                results.append(book)
+        return results
