@@ -25,10 +25,6 @@ def read_config():
 
     conf = {**get_default_config(), **conf}
 
-    loglevel = logging._nameToLevel[conf.get('loglevel', 'INFO')]
-    logging.basicConfig(format='%(asctime)s - %(message)s',
-                        datefmt='%d-%b-%y %H:%M:%S', level=loglevel)
-
     return conf
 
 
@@ -55,3 +51,13 @@ def query_isbn_data(isbn_str) -> dict:
         return meta
     else:
         return None
+
+
+
+def query_google_books(words):
+    logging.debug('query google books for %s' % words)
+    try:
+        results = isbnlib.goom(words)
+    except isbnlib.dev._exceptions.NoDataForSelectorError as e:
+        results = []
+    return results

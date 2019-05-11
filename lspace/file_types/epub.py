@@ -1,9 +1,11 @@
 from typing import List
 
 import ebooklib
-from ebooklib import epub
-from elib.file_types._base import FileTypeBase
 import html2text
+from ebooklib import epub
+
+from ._base import FileTypeBase
+
 
 class Epub(FileTypeBase):
     extenstion = '.epub'

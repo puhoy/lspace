@@ -6,8 +6,6 @@ chardet==3.0.4
 Click==7.0
 colorama==0.4.1
 EbookLib==0.17.1
-# Editable Git install with no remote (elib==0.1)
--e /home/meatpuppet/dev/elib
 Flask==1.0.2
 Flask-Migrate==2.4.0
 Flask-SQLAlchemy==2.4.0

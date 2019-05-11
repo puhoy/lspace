@@ -1,8 +1,9 @@
 
 from typing import List
+
 import PyPDF2 as pypdf
 
-from elib.file_types._base import FileTypeBase
+from ._base import FileTypeBase
 
 
 class PDF(FileTypeBase):

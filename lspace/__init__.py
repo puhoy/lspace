@@ -2,10 +2,10 @@ import os
 
 import click
 
-APP_NAME = 'elib'
+APP_NAME = 'lspace'
 CONFIG_FILE = 'config.yaml'
 
-os.environ['FLASK_APP'] = 'elib/app.py'
+os.environ['FLASK_APP'] = 'lspace/app.py'
 
 app_dir = click.get_app_dir(APP_NAME)
 

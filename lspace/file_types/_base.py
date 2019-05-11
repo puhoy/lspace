@@ -5,8 +5,9 @@ import string
 
 import isbnlib
 
-from ..helpers import query_isbn_data
+from ..helpers import query_isbn_data, query_google_books
 
+logger = logging.getLogger(__name__)
 
 class FileTypeBase:
     def __init__(self, path):
@@ -36,22 +37,23 @@ class FileTypeBase:
         with open(self.path, 'rb') as file_to_check:
             data = file_to_check.read()
             md5sum = hashlib.md5(data).hexdigest()
-        logging.debug('md5 is %s' % md5sum)
+        logger.debug('md5 is %s' % md5sum)
         return md5sum
 
     def find_in_db(self):
-        logging.info('processing %s' % self.path)
+        print(logger.getEffectiveLevel())
+        logger.info('processing %s' % self.path)
 
         # try isbn from metadata
         _isbn = self.get_isbn()
         if _isbn:
-            logging.info('found isbn %s in metadata!' % _isbn)
+            logger.info('found isbn %s in metadata!' % _isbn)
             d = query_isbn_data(_isbn)
             if d:
                 return [d]
 
         # try find isbn in text
-        logging.info('getting from text...')
+        logger.info('getting from text...')
         isbns = self.get_isbns_from_text()
         if isbns:
             isbns_with_metadata = []
@@ -59,19 +61,23 @@ class FileTypeBase:
                 d = query_isbn_data(isbn)
                 if d:
                     isbns_with_metadata.append(d)
-            return isbns_with_metadata
+            if isbns_with_metadata:
+                return isbns_with_metadata
 
         
         # try from author + title in metadata:
-        logging.info('getting from author + title...')
+        logger.info('getting from author + title...')
         if self.get_author() and self.get_title():
-            return isbnlib.goom(self._clean_filename())
+            results = query_google_books(self._clean_filename())
+            if results:
+                return results
 
         # from filename
-        logging.info('getting from filename...')
+        logger.info('getting from filename...')
         guessed_meta = self.guess_from_filename()
         if guessed_meta:
             return guessed_meta
+        
         return []
 
     def _clean_filename(self):
@@ -85,9 +91,9 @@ class FileTypeBase:
 
     def guess_from_filename(self):
         clean_filename = self._clean_filename()
-        logging.debug('looking for %s' % clean_filename)
+        logger.info('looking for %s' % clean_filename)
         results = isbnlib.goom(clean_filename)
-        logging.info('results: %s' % results)
+        logger.debug('results: %s' % results)
         return results
 
     def _preprocess_isbns(self, isbns):

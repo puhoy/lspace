@@ -8,7 +8,7 @@ from shutil import move, copyfile
 import yaml
 
 from ..file_types import get_file_type_class
-from ..helpers import query_isbn_data
+from ..helpers import query_isbn_data, query_google_books
 from ..models.author import Author
 from ..models.book import Book
 from ..config import library_path, user_config
@@ -37,7 +37,7 @@ def import_command(document_path, reimport, move):
             f = file_class(path)
             
             if not reimport and Book.query.filter_by(md5sum=f.get_md5()).first():
-                logging.info('%s already imported, skipping...' % path)
+                click.echo('%s already imported, skipping...' % path)
                 continue
 
             click.echo('getting metadata for %s' % path)
@@ -81,9 +81,14 @@ def import_command(document_path, reimport, move):
 def lookup_isbn():
     isbn_str = click.prompt(
         'specify isbn (without whitespaces, only the number)')
-    return query_isbn_data(isbn_str)
+    result = query_isbn_data(isbn_str)
+    if result:
+        return [result]
+    return []
 
 def choose_result(file_type_object, isbns_with_metadata):
+    if not isbns_with_metadata:
+        click.echo('no results found :(')
     isbns_with_metadata += other_choices
     formatted_choices = format_metadata_choices(
         isbns_with_metadata)
@@ -99,19 +104,18 @@ def choose_result(file_type_object, isbns_with_metadata):
     return choice
 
 
-def query_google_books(words):
-    return isbnlib.goom(words)
-
 
 def _copy_to_library(file_type_object, choice, move_file):
-    os.makedirs(library_path, exist_ok=True)
-
     # prepare the fields for path building
-    print(choice)
     author_slugs = [slugify(author_name) for author_name in choice['Authors']]
+    if not author_slugs:
+        author_slugs = ['UNKNOWN AUTHOR']
 
     AUTHORS = '_'.join(author_slugs)
     TITLE = slugify(choice['Title'])
+
+    logging.debug('author slug: %s' % AUTHORS)
+    logging.debug('title slug: %s' % TITLE)
 
     # create the path for the book
     path_found = False
@@ -120,6 +124,11 @@ def _copy_to_library(file_type_object, choice, move_file):
     while not path_found and count < 100:
         path_in_library = user_config['file_format'].format(
             AUTHORS=AUTHORS, TITLE=TITLE)
+        # if, for some reason, the path starts with /, we need to make it relative
+        while path_in_library.startswith(os.sep):
+            logging.debug('trimming path to %s' % path_in_library[1:])
+            path_in_library = path_in_library[1:]
+
         if count == 0:
             path_in_library += file_type_object.extenstion
         else:
@@ -136,6 +145,7 @@ def _copy_to_library(file_type_object, choice, move_file):
                       file_type_object.path)
 
     os.makedirs(os.path.dirname(target_path), exist_ok=True)
+    logging.debug('importing to %s' % target_path)
     if not move_file:
         copyfile(file_type_object.path, target_path)
     else:
@@ -177,12 +187,22 @@ def _import(file_type_object, choice, move_file):
         logging.info('adding book %s' % book)
         db.session.add(book)
         db.session.commit()
+import copy
 
 
 def format_metadata_choices(isbns_with_metadata):
+    isbns_with_metadata = copy.deepcopy(isbns_with_metadata)
+
     formatted_metadata = []
     for idx, meta in enumerate(isbns_with_metadata):
-        logging.debug('adding %s' % meta)
-        formatted_metadata.append(yaml.dump({idx+1: meta}, allow_unicode=True))
+        logging.info('adding %s' % meta)
+
+        if type(meta) == dict:
+            authors = ', '.join([author for author in meta.pop('Authors', [])])
+            title = meta.pop('Title')
+            formatted_metadata.append(f'\n{idx+1}: {authors} - {title}\n' + yaml.dump(meta, allow_unicode=True))
+
+        else:
+            formatted_metadata.append(yaml.dump({idx+1: meta}, allow_unicode=True))
     logging.debug('formatted data is %s' % formatted_metadata)
     return formatted_metadata

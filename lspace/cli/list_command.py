@@ -10,7 +10,10 @@ from ..config import user_config, library_path
 @click.argument('query', nargs=-1)
 @click.option('--path', is_flag=True)
 def _list(query, path):
-    results = Book.query.whooshee_search(' '.join(query)).all()
+    if not query:
+        results = Book.query.all()
+    else:
+        results = Book.query.whooshee_search(' '.join(query)).all()
     if path:
         for result in results:
             

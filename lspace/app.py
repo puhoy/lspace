@@ -1,16 +1,16 @@
 import os
+import logging
+from .helpers import read_config
 
 from flask import Flask
 from flask.cli import AppGroup
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from flask_migrate import Migrate, current, upgrade
 from flask_whooshee import Whooshee
 
 from . import APP_NAME
 from . import CONFIG_FILE
 from . import app_dir
-
-from .helpers import read_config
 
 config = read_config()
 
@@ -27,6 +27,11 @@ migrate = Migrate(app, db)
 
 cli_group = AppGroup('cli')
 
+def upgrade_db_if_needed(app):
+    with app.app_context():
+        upgrade()
+        
+upgrade_db_if_needed(app)
 
 # import after app is created
 from .models import *

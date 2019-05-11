@@ -3,10 +3,8 @@ import os
 import click
 import yaml
 
-from .. import CONFIG_FILE
+from .. import CONFIG_FILE, app_dir
 from ..helpers import get_default_config
-
-from .. import app_dir
 from . import cli
 
 
