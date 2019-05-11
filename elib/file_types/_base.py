@@ -57,7 +57,8 @@ class FileTypeBase:
             isbns_with_metadata = []
             for isbn in isbns:
                 d = query_isbn_data(isbn)
-                isbns_with_metadata.append(d)
+                if d:
+                    isbns_with_metadata.append(d)
             return isbns_with_metadata
 
         

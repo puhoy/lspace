@@ -8,9 +8,10 @@ from shutil import move, copyfile
 import yaml
 
 from ..file_types import get_file_type_class
-from ..helpers import read_config, query_isbn_data
+from ..helpers import query_isbn_data
 from ..models.author import Author
 from ..models.book import Book
+from ..config import library_path, user_config
 from . import cli
 
 from ..app import db
@@ -28,7 +29,6 @@ other_choices = [run_search, isbn_lookup, specify_manually, skip]
 @click.option('--reimport', help='dont check if this file is in the library', default=False, is_flag=True)
 @click.option('--move', help='move imported files instead copying', default=False, is_flag=True)
 def import_command(document_path, reimport, move):
-    config = read_config()
 
     for path in document_path:
 
@@ -49,6 +49,7 @@ def import_command(document_path, reimport, move):
                 choice = choose_result(f, [])
                 
             elif len(isbns_with_metadata) == 1:
+                click.echo('got one result: %s - importing!' % isbns_with_metadata[0])
                 choice = isbns_with_metadata[0]
 
             else:
@@ -69,7 +70,7 @@ def import_command(document_path, reimport, move):
                     choice = False
 
             if choice:
-                _import(f, choice, config, move)
+                _import(f, choice, move)
             else:
                 click.echo('could not import %s' % path, color='yellow')
 
@@ -87,7 +88,7 @@ def choose_result(file_type_object, isbns_with_metadata):
     formatted_choices = format_metadata_choices(
         isbns_with_metadata)
 
-    click.echo('\n'.join(formatted_choices))
+    click.echo(''.join(formatted_choices))
 
     ret = click.prompt('choose result for %s' % file_type_object.filename, type=click.IntRange(
         min=1,
@@ -102,28 +103,27 @@ def query_google_books(words):
     return isbnlib.goom(words)
 
 
-
-def _import(file_type_object, choice, conf, move_file):
-    library_path = os.path.abspath(os.path.expanduser(conf['library_path']))
+def _copy_to_library(file_type_object, choice, move_file):
     os.makedirs(library_path, exist_ok=True)
 
     # prepare the fields for path building
+    print(choice)
     author_slugs = [slugify(author_name) for author_name in choice['Authors']]
 
     AUTHORS = '_'.join(author_slugs)
-    TITLE = choice['Title']
+    TITLE = slugify(choice['Title'])
 
     # create the path for the book
     path_found = False
     count = 0
     path_in_library = False
     while not path_found and count < 100:
-        path_in_library = conf['file_format'].format(
+        path_in_library = user_config['file_format'].format(
             AUTHORS=AUTHORS, TITLE=TITLE)
         if count == 0:
             path_in_library += file_type_object.extenstion
         else:
-            path_in_library = f'{path_in_library}_{count}.{file_type_object.extenstion}'
+            path_in_library = f'{path_in_library}_{count}{file_type_object.extenstion}'
 
         target_path = os.path.join(library_path, path_in_library)
 
@@ -140,6 +140,12 @@ def _import(file_type_object, choice, conf, move_file):
         copyfile(file_type_object.path, target_path)
     else:
         move(file_type_object.path, target_path)
+    
+    return path_in_library
+
+
+def _import(file_type_object, choice, move_file):
+    path_in_library = _copy_to_library(file_type_object, choice, move_file)
 
     authors = []
     for author_name in choice['Authors']:
@@ -152,12 +158,12 @@ def _import(file_type_object, choice, conf, move_file):
         db.session.commit()
 
     title = choice['Title']
-    isbn_13 = choice['ISBN-13']
+    isbn13 = choice['ISBN-13']
     publisher = choice['Publisher']
     year = choice['Year']
     language = choice['Language']
 
-    book = db.session.query(Book).filter_by(isbn_13=isbn_13).first()
+    book = db.session.query(Book).filter_by(isbn13=isbn13).first()
     if not book:
         book = Book(
             title=title,

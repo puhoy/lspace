@@ -8,6 +8,6 @@ from .init_command import init
 from .tools_command import convert_to_isbn13, find_meta_by_text
 from .db_command import migrate, upgrade, init
 from .list_command import _list
-
+from .reindex_command import reindex
 
 

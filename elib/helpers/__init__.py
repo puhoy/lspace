@@ -32,16 +32,17 @@ def read_config():
     return conf
 
 
-def get_metadata_for_isbn(isbn, serice='openl'):
+def get_metadata_for_isbn(isbn, serice='openl') -> dict:
     try:
         meta = isbnlib.meta(isbn, service='openl', cache='default')
     except (isbnlib.dev._exceptions.NoDataForSelectorError,
-            isbnlib._exceptions.NotValidISBNError
+            isbnlib._exceptions.NotValidISBNError,
+            isbnlib.dev._exceptions.DataNotFoundAtServiceError
             ):
         meta = {}
     return meta
 
-def query_isbn_data(isbn_str):
+def query_isbn_data(isbn_str) -> dict:
     if isbnlib.is_isbn10(isbn_str):
         isbn_str = isbnlib.to_isbn13(isbn_str)
     
@@ -51,6 +52,6 @@ def query_isbn_data(isbn_str):
         meta = get_metadata_for_isbn(isbn_str, 'goob')
 
     if meta:
-        return [meta]
+        return meta
     else:
-        return []
+        return None
