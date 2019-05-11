@@ -7,12 +7,14 @@ import isbnlib
 from .. import app_dir
 from .. import CONFIG_FILE
 
+
 def get_default_config():
     this_dir = os.path.dirname(os.path.abspath(__file__))
     path_from_here = '../config/'
     with open(os.path.join(this_dir, path_from_here, 'default_conf.yaml'), 'r') as default_config_file:
         default_config = yaml.load(default_config_file, Loader=yaml.SafeLoader)
-        default_config['database_path'] = default_config['database_path'].format(APP_DIR=app_dir)
+        default_config['database_path'] = default_config['database_path'].format(
+            APP_DIR=app_dir)
     return default_config
 
 
@@ -30,21 +32,25 @@ def read_config():
     return conf
 
 
+def get_metadata_for_isbn(isbn, serice='openl'):
+    try:
+        meta = isbnlib.meta(isbn, service='openl', cache='default')
+    except (isbnlib.dev._exceptions.NoDataForSelectorError,
+            isbnlib._exceptions.NotValidISBNError
+            ):
+        meta = {}
+    return meta
 
-def query_isbn_data(isbn):
+def query_isbn_data(isbn_str):
     if isbnlib.is_isbn10(isbn_str):
         isbn_str = isbnlib.to_isbn13(isbn_str)
-    try:
-        meta = isbnlib.meta(isbn_str, service='openl', cache='default')
-    except isbnlib.dev._exceptions.NoDataForSelectorError:
-        meta = {}
+    
+    meta = get_metadata_for_isbn(isbn_str, 'openl')
+    
     if not meta:
-        try:
-            meta = isbnlib.meta(isbn_str, service='goob', cache='default')
-        except isbnlib.dev._exceptions.NoDataForSelectorError:
-            meta = {}
+        meta = get_metadata_for_isbn(isbn_str, 'goob')
+
     if meta:
         return [meta]
     else:
         return []
-

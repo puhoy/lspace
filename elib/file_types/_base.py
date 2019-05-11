@@ -46,6 +46,9 @@ class FileTypeBase:
         _isbn = self.get_isbn()
         if _isbn:
             logging.info('found isbn %s in metadata!' % _isbn)
+            d = query_isbn_data(_isbn)
+            if d:
+                return [d]
 
         # try find isbn in text
         logging.info('getting from text...')
