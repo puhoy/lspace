@@ -8,9 +8,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, current, upgrade
 from flask_whooshee import Whooshee
 
-from . import APP_NAME
-from . import CONFIG_FILE
-from . import app_dir
+from lspace import APP_NAME
+from lspace import CONFIG_FILE
+from lspace import app_dir
 
 config = read_config()
 
@@ -36,5 +36,5 @@ def upgrade_db_if_needed(app):
 upgrade_db_if_needed(app)
 
 # import after app is created
-from .models import *
-from .cli import *
+from lspace.models import *
+from lspace.cli import *
