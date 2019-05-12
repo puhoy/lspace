@@ -9,7 +9,10 @@ setup(
         [console_scripts]
         lspace=lspace.app:cli_group
     ''',
+    description='a ebook manager built around isbnlib',
+    url='https://github.com/puhoy/lspace',
     long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     install_requires=[
         "alembic == 1.0.10",
         "astroid == 2.2.5",
