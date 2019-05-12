@@ -1,8 +1,10 @@
 import os
 import click
+import shutil
 
 from . import cli
 from ..helpers import query_db
+from ..app import db
 
 
 @cli.command(help='remove books from library')
@@ -18,7 +20,10 @@ def remove(query):
         click.echo(f'{authors_str} - {result.title}')
         click.echo(f'{result.full_path}')
         if click.confirm('delete this book from library?'):
-            click.echo('deleting')
+            os.unlink(result.full_path)
+            db.session.delete(result)
+            db.session.commit()
+        
 
 
 

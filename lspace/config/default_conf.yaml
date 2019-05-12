@@ -1,6 +1,6 @@
 
 
-database_path: sqlite:///{APP_DIR}/elib.db
+database_path: sqlite:///{APP_DIR}/lspace.db
 library_path: ~/library
 
 file_format: '{AUTHORS}/{TITLE}'

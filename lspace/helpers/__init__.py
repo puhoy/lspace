@@ -20,11 +20,14 @@ def get_default_config():
 
 def read_config():
     config_path = os.path.join(app_dir, CONFIG_FILE)
-    with open(config_path, 'r') as config:
-        conf = yaml.load(config, Loader=yaml.SafeLoader)
+    if os.path.isfile(config_path):
+        with open(config_path, 'r') as config:
+            conf = yaml.load(config, Loader=yaml.SafeLoader)
 
+    else:
+        conf = {}
+    
     conf = {**get_default_config(), **conf}
-
     return conf
 
 
@@ -72,4 +75,4 @@ def query_db(query, books=True, authors=True):
         for author in author_results:
             for book in author.books:
                 results.append(book)
-        return results
+    return results
