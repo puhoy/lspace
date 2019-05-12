@@ -8,7 +8,7 @@ from ..config import user_config, library_path
 from ..helpers import query_db
 
 
-@cli.command(name='list')
+@cli.command(name='list', help='query your database')
 @click.argument('query', nargs=-1)
 @click.option('--path', is_flag=True)
 @click.option('--details', is_flag=True)

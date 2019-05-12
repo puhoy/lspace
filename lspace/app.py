@@ -23,7 +23,9 @@ app.config['WHOOSHEE_DIR'] = os.path.join(app_dir, 'whoosh_index')
 whooshee = Whooshee(app)
 
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+
+MIGRATION_DIR=os.path.join(os.path.dirname(__file__), 'migrations')
+migrate = Migrate(app, db, directory=MIGRATION_DIR)
 
 cli_group = AppGroup('cli')
 

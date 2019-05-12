@@ -7,7 +7,7 @@ import yaml
 from . import cli
 from ..app import whooshee
 
-@cli.group()
+@cli.group(help='tools you probably never need... :P')
 def tools():
     pass
 

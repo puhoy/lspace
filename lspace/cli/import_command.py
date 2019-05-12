@@ -24,7 +24,7 @@ other_choices = [run_search, isbn_lookup, specify_manually, skip]
 
 
 
-@cli.command(name='import')
+@cli.command(name='import', help='import ebooks into your database')
 @click.argument('document_path', type=click.Path(exists=True), nargs=-1)
 @click.option('--reimport', help='dont check if this file is in the library', default=False, is_flag=True)
 @click.option('--move', help='move imported files instead copying', default=False, is_flag=True)
