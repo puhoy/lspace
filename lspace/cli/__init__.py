@@ -1,7 +1,7 @@
 import click
 
 from .. import APP_NAME
-from ..app import cli_group as cli
+from ..app import app, cli_group as cli
 from .import_command import import_command
 from .init_command import init
 from .list_command import _list

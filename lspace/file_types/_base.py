@@ -9,6 +9,7 @@ from ..helpers import query_isbn_data, query_google_books
 
 logger = logging.getLogger(__name__)
 
+
 class FileTypeBase:
     def __init__(self, path):
         self.path = path
@@ -53,7 +54,7 @@ class FileTypeBase:
                 return [d]
 
         # try find isbn in text
-        logger.info('getting from text...')
+        logger.info('looking for isbn in text...')
         isbns = self.get_isbns_from_text()
         if isbns:
             isbns_with_metadata = []

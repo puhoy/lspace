@@ -24,6 +24,11 @@ class Book(db.Model):
     path = Column(String(400))
 
     @property
-    def full_path(self):
+    def full_path(self) -> str:
         return f'{os.path.join(library_path, self.path)}'
+
+    @property
+    def authors_names(self) -> str:
+        return ', '.join(author.name for author in self.authors)
+
 
