@@ -15,7 +15,7 @@ just python3 and pip should be fine
 
 ## installation
 
-`pip install git+https://github.com/puhoy/lspace`
+`pip install lspace`
 
 
 ## setup 
