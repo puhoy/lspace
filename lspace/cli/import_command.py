@@ -18,9 +18,9 @@ from ..app import db
 
 run_search = 'run another query'
 isbn_lookup = 'lookup by isbn'
-specify_manually = 'specify manually'
+#specify_manually = 'specify manually'
 skip = 'skip'
-other_choices = [run_search, isbn_lookup, specify_manually, skip]
+other_choices = [run_search, isbn_lookup, skip]
 
 
 
@@ -102,8 +102,6 @@ def choose_result(file_type_object, isbns_with_metadata):
     idx = ret - 1
     choice = isbns_with_metadata[idx]
     return choice
-
-
 
 def _copy_to_library(file_type_object, choice, move_file):
     # prepare the fields for path building
