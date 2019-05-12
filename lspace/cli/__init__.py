@@ -7,5 +7,6 @@ from .init_command import init
 from .list_command import _list
 from .tools_command import tools
 from .remove_command import remove
+from .version_command import version
 
 #from .db_command import migrate, upgrade, init

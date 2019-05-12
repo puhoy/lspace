@@ -1,3 +1,6 @@
+
+__version__ = '0.0.0'
+
 import os
 
 import click
@@ -8,4 +11,3 @@ CONFIG_FILE = 'config.yaml'
 os.environ['FLASK_APP'] = 'lspace/app.py'
 
 app_dir = click.get_app_dir(APP_NAME)
-
