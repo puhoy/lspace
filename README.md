@@ -1,4 +1,4 @@
-# l-space
+# L-Space
 
 a cli ebook manager built around [isbnlib](https://github.com/xlcnd/isbnlib)
 

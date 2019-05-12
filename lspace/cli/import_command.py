@@ -16,6 +16,8 @@ from . import cli
 
 from ..app import db
 
+logger = logging.getLogger(__name__)
+
 run_search = 'run another query'
 isbn_lookup = 'lookup by isbn'
 #specify_manually = 'specify manually'
@@ -31,10 +33,15 @@ other_choices = [run_search, isbn_lookup, skip]
 def import_command(document_path, reimport, move):
 
     for path in document_path:
-
+        click.echo('processing %s' % path)
         file_class = get_file_type_class(path)
         if file_class:
-            f = file_class(path)
+            try:
+                f = file_class(path)
+            except Exception as e:
+                logger.error("error reading %s" % path, exc_info=True)
+                click.secho("error reading %s" % path, fg='red')
+                continue
             
             if not reimport and Book.query.filter_by(md5sum=f.get_md5()).first():
                 click.echo('%s already imported, skipping...' % path)
@@ -112,8 +119,8 @@ def _copy_to_library(file_type_object, choice, move_file):
     AUTHORS = '_'.join(author_slugs)
     TITLE = slugify(choice['Title'])
 
-    logging.debug('author slug: %s' % AUTHORS)
-    logging.debug('title slug: %s' % TITLE)
+    logger.debug('author slug: %s' % AUTHORS)
+    logger.debug('title slug: %s' % TITLE)
 
     # create the path for the book
     path_found = False
@@ -124,7 +131,7 @@ def _copy_to_library(file_type_object, choice, move_file):
             AUTHORS=AUTHORS, TITLE=TITLE)
         # if, for some reason, the path starts with /, we need to make it relative
         while path_in_library.startswith(os.sep):
-            logging.debug('trimming path to %s' % path_in_library[1:])
+            logger.debug('trimming path to %s' % path_in_library[1:])
             path_in_library = path_in_library[1:]
 
         if count == 0:
@@ -139,11 +146,11 @@ def _copy_to_library(file_type_object, choice, move_file):
 
         count += 1
     if not path_in_library:
-        logging.error('could not find a path in the library for %s' %
+        logger.error('could not find a path in the library for %s' %
                       file_type_object.path)
 
     os.makedirs(os.path.dirname(target_path), exist_ok=True)
-    logging.debug('importing to %s' % target_path)
+    logger.debug('importing to %s' % target_path)
     if not move_file:
         copyfile(file_type_object.path, target_path)
     else:
@@ -159,7 +166,7 @@ def _import(file_type_object, choice, move_file):
     for author_name in choice['Authors']:
         author = Author.query.filter_by(name=author_name).first()
         if not author:
-            logging.info('creating %s' % author_name)
+            logger.info('creating %s' % author_name)
             author = Author(name=author_name)
             db.session.add(author)
         authors.append(author)
@@ -182,7 +189,7 @@ def _import(file_type_object, choice, move_file):
             md5sum=file_type_object.get_md5(),
             path=path_in_library
         )
-        logging.info('adding book %s' % book)
+        logger.info('adding book %s' % book)
         db.session.add(book)
         db.session.commit()
 import copy
@@ -193,7 +200,7 @@ def format_metadata_choices(isbns_with_metadata):
 
     formatted_metadata = []
     for idx, meta in enumerate(isbns_with_metadata):
-        logging.info('adding %s' % meta)
+        logger.info('adding %s' % meta)
 
         if type(meta) == dict:
             authors = ', '.join([author for author in meta.pop('Authors', [])])
@@ -202,5 +209,5 @@ def format_metadata_choices(isbns_with_metadata):
 
         else:
             formatted_metadata.append(yaml.dump({idx+1: meta}, allow_unicode=True))
-    logging.debug('formatted data is %s' % formatted_metadata)
+    logger.debug('formatted data is %s' % formatted_metadata)
     return formatted_metadata
