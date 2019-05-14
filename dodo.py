@@ -8,8 +8,20 @@ def task_build():
         'clean': ['rm -fr %(targets)s']
     }
 
-def task_bump():
+
+def task_bump_dryrun():
     return {'actions': ['bump2version --verbose --dry-run %(part)s'],
+            'params': [{'name': 'part',
+                        'long': 'part',
+                        'type': str,
+                        'choices': (('patch', ''), ('minor', ''), ('major', '')),
+                        'default': False,
+                        'help': 'Choose between patch, minor, major'}],
+            'verbosity': 2, }
+
+
+def task_bump():
+    return {'actions': ['bump2version --verbose %(part)s'],
             'params': [{'name': 'part',
                         'long': 'part',
                         'type': str,
