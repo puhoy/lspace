@@ -41,11 +41,11 @@ class FileTypeBase:
         logger.debug('md5 is %s' % md5sum)
         return md5sum
 
-    def find_in_db(self):
-        print(logger.getEffectiveLevel())
+    def find_metadata(self):
         logger.info('processing %s' % self.path)
 
         # try isbn from metadata
+        logger.info('looking for isbn in metadata...')
         _isbn = self.get_isbn()
         if _isbn:
             logger.info('found isbn %s in metadata!' % _isbn)
@@ -63,6 +63,7 @@ class FileTypeBase:
                 if d:
                     isbns_with_metadata.append(d)
             if isbns_with_metadata:
+                logger.info('found isbns in text!')
                 return isbns_with_metadata
 
         
@@ -71,6 +72,7 @@ class FileTypeBase:
         if self.get_author() and self.get_title():
             results = query_google_books(self._clean_filename())
             if results:
+                logger.info('found isbns from author + title...')
                 return results
 
         # from filename

@@ -39,7 +39,8 @@ def add_book_to_db(file_type_object, result, path_in_library):
             year=year,
             language=language,
             md5sum=file_type_object.get_md5(),
-            path=path_in_library
+            path=path_in_library,
+            isbn13=isbn13
         )
         logger.info('adding book %s' % book)
         db.session.add(book)

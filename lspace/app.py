@@ -1,5 +1,8 @@
 import os
 import logging
+
+from flask_marshmallow import Marshmallow
+
 from .helpers import read_config
 
 from flask import Flask
@@ -23,6 +26,7 @@ app.config['WHOOSHEE_DIR'] = os.path.join(app_dir, 'whoosh_index')
 whooshee = Whooshee(app)
 
 db = SQLAlchemy(app)
+marshmallow = Marshmallow(app)
 
 MIGRATION_DIR=os.path.join(os.path.dirname(__file__), 'migrations')
 migrate = Migrate(app, db, directory=MIGRATION_DIR)
