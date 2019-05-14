@@ -10,7 +10,7 @@ def task_build():
 
 
 def task_bump_dryrun():
-    return {'actions': ['bump2version --verbose --dry-run %(part)s'],
+    return {'actions': ['bump2version --verbose --dry-run --allow-dirty %(part)s'],
             'params': [{'name': 'part',
                         'long': 'part',
                         'type': str,
