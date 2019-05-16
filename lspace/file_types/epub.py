@@ -44,6 +44,8 @@ class Epub(FileTypeBase):
         # [('Ratio', {})]
         if _isbn:
             isbn = _isbn[0][0]
+            if not isbn:
+                return None
             if isbnlib.notisbn(isbn):
                 return None
             if isbnlib.is_isbn10(isbn):

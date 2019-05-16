@@ -13,6 +13,7 @@ from flask_whooshee import Whooshee
 
 from lspace import APP_NAME
 from lspace import CONFIG_FILE
+from lspace import MIGRATION_DIR
 from lspace import app_dir
 
 config = read_config()
@@ -28,15 +29,16 @@ whooshee = Whooshee(app)
 db = SQLAlchemy(app)
 marshmallow = Marshmallow(app)
 
-MIGRATION_DIR=os.path.join(os.path.dirname(__file__), 'migrations')
 migrate = Migrate(app, db, directory=MIGRATION_DIR)
 
 cli_group = AppGroup('cli')
 
+
 def upgrade_db_if_needed(app):
     with app.app_context():
         upgrade()
-        
+
+
 upgrade_db_if_needed(app)
 
 # import after app is created

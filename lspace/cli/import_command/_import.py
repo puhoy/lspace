@@ -3,11 +3,13 @@ import logging
 
 import click
 import yaml
+
+from lspace.cli.import_command.peek_function import peek_function
 from lspace.cli.import_command.add_book_to_db import add_book_to_db
 from lspace.cli.import_command.copy_to_library import _copy_to_library
-from lspace.cli.import_command.lookup_isbn import lookup_isbn
-from lspace.cli.import_command.skip_book import skip_book
-from lspace.cli.import_command.run_search import run_search as _run_search
+from lspace.cli.import_command.lookup_isbn_function import lookup_isbn_function
+from lspace.cli.import_command.skip_book_function import skip_book_function
+from lspace.cli.import_command.run_search_function import run_search_function
 
 from lspace.file_types import get_file_type_class
 from lspace.models import Book
@@ -18,17 +20,21 @@ run_search = 'run another query'
 isbn_lookup = 'lookup by isbn'
 # specify_manually = 'specify manually'
 skip = 'skip'
+peek = 'peek in the text'
 
 other_choices = {
     'q': dict(
-        function=_run_search,
+        function=run_search_function,
         explanation=run_search),
     'i': dict(
-        function=lookup_isbn,
+        function=lookup_isbn_function,
         explanation=isbn_lookup),
     's': dict(
-        function=skip_book,
-        explanation=skip)
+        function=skip_book_function,
+        explanation=skip),
+    'p': dict(
+        function=peek_function,
+        explanation=peek)
 }
 
 
@@ -55,10 +61,6 @@ def guided_import(path, skip_library_check, move):
             click.echo('could not find any isbn or metadata for %s' % f.filename)
             choice = choose_result(f, [])
 
-        elif len(isbns_with_metadata) == 1:
-            click.echo('got one result: %s - importing!' % isbns_with_metadata[0])
-            choice = isbns_with_metadata[0]
-
         else:
             choice = choose_result(f, isbns_with_metadata)
 
@@ -69,10 +71,10 @@ def guided_import(path, skip_library_check, move):
             # but one of the strings mapped to functions
 
             function_that_gets_new_choices = other_choices.get(choice)['function']
-            new_results = function_that_gets_new_choices()
+            isbns_with_metadata = function_that_gets_new_choices(file_type_object=f, old_choices=isbns_with_metadata)
 
-            if new_results is not False:
-                choice = choose_result(f, new_results)
+            if isbns_with_metadata is not False:
+                choice = choose_result(f, isbns_with_metadata)
             else:
                 # "skip" is the only function that returns false here
                 choice = False
@@ -125,14 +127,14 @@ def format_metadata_choices(isbns_with_metadata) -> dict:
         authors = ', '.join([author for author in meta.pop('Authors', [])])
         title = meta.pop('Title')
         formatted_metadata[str(idx + 1)] = \
-            f'\n{idx + 1}: {authors} - {title}\n' + yaml.dump(meta, allow_unicode=True)
+            click.style(f'\n{idx + 1}: {authors} - {title}\n', bold=True) + yaml.dump(meta, allow_unicode=True)
 
         # otherwise its one of the other options, like search etc
     for key, val in other_choices.items():
         formatted_metadata[key] = \
-            yaml.dump({
+            click.style(yaml.dump({
                 key: val['explanation']},
-                allow_unicode=True)
+                allow_unicode=True), bold=True)
 
     logger.debug('formatted data is %s' % formatted_metadata)
     return formatted_metadata

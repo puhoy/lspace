@@ -1,6 +1,5 @@
 import os
 import click
-import shutil
 
 from . import cli
 from ..helpers import query_db
