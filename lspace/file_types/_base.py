@@ -45,46 +45,47 @@ class FileTypeBase:
         logger.info('processing %s' % self.path)
 
         # try isbn from metadata
-        logger.info('looking for isbn in metadata...')
-        _isbn = self.get_isbn()
-        if _isbn:
-            logger.info('found isbn %s in metadata!' % _isbn)
-            d = query_isbn_data(_isbn)
-            if d:
-                return [d]
-
-        # try find isbn in text
-        logger.info('looking for isbn in text...')
-        isbns = self.get_isbns_from_text()
-        if isbns:
-            isbns_with_metadata = []
-            for isbn in isbns:
-                d = query_isbn_data(isbn)
+        while True:
+            logger.info('looking for isbn in metadata...')
+            _isbn = self.get_isbn()
+            if _isbn:
+                logger.info('found isbn %s in metadata!' % _isbn)
+                d = query_isbn_data(_isbn)
                 if d:
-                    isbns_with_metadata.append(d)
-            if isbns_with_metadata:
-                logger.info('found isbns in text!')
-                return isbns_with_metadata
+                    yield [d]
 
-        
-        # try from author + title in metadata:
-        logger.info('getting from author + title...')
-        if self.get_title():
-            search_str = self._filter_symbols(self.get_title())
-            if self.get_author():
-                search_str = f'{self._filter_symbols(self.get_author())} {search_str}'
-            results = query_google_books(search_str)
-            if results:
-                logger.info('found isbns from author + title...')
-                return results
+            # try find isbn in text
+            logger.info('looking for isbn in text...')
+            isbns = self.get_isbns_from_text()
+            if isbns:
+                isbns_with_metadata = []
+                for isbn in isbns:
+                    d = query_isbn_data(isbn)
+                    if d:
+                        isbns_with_metadata.append(d)
+                if isbns_with_metadata:
+                    logger.info('found isbns in text!')
+                    yield isbns_with_metadata
 
-        # from filename
-        logger.info('getting from filename...')
-        guessed_meta = self.guess_from_filename()
-        if guessed_meta:
-            return guessed_meta
-        
-        return []
+
+            # try from author + title in metadata:
+            logger.info('getting from author + title...')
+            if self.get_title():
+                search_str = self._filter_symbols(self.get_title())
+                if self.get_author():
+                    search_str = f'{self._filter_symbols(self.get_author())} {search_str}'
+                results = query_google_books(search_str)
+                if results:
+                    logger.info('found isbns from author + title...')
+                    yield results
+
+            # from filename
+            logger.info('getting from filename...')
+            guessed_meta = self.guess_from_filename()
+            if guessed_meta:
+                yield guessed_meta
+
+            yield []
 
     def _filter_symbols(self, s: str):
         whitelist = string.ascii_letters + string.digits + ' '

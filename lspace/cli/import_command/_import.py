@@ -21,6 +21,12 @@ isbn_lookup = 'lookup by isbn'
 # specify_manually = 'specify manually'
 skip = 'skip'
 peek = 'peek in the text'
+next_search = 'try another search from file'
+
+
+def try_next_results(file_type_object_searcher, *args, **kwargs):
+    return next(file_type_object_searcher)
+
 
 other_choices = {
     'q': dict(
@@ -34,7 +40,10 @@ other_choices = {
         explanation=skip),
     'p': dict(
         function=peek_function,
-        explanation=peek)
+        explanation=peek),
+    't': dict(
+        function=try_next_results,
+        explanation=next_search)
 }
 
 
@@ -54,8 +63,8 @@ def guided_import(path, skip_library_check, move):
             return
 
         click.echo('getting metadata for %s' % path)
-
-        isbns_with_metadata = f.find_metadata()
+        file_type_object_searcher = f.find_metadata()
+        isbns_with_metadata = next(file_type_object_searcher)
 
         if len(isbns_with_metadata) == 0:
             click.echo('could not find any isbn or metadata for %s' % f.filename)
@@ -71,7 +80,8 @@ def guided_import(path, skip_library_check, move):
             # but one of the strings mapped to functions
 
             function_that_gets_new_choices = other_choices.get(choice)['function']
-            isbns_with_metadata = function_that_gets_new_choices(file_type_object=f, old_choices=isbns_with_metadata)
+            isbns_with_metadata = function_that_gets_new_choices(file_type_object=f, old_choices=isbns_with_metadata,
+                                                                 file_type_object_searcher=file_type_object_searcher)
 
             if isbns_with_metadata is not False:
                 choice = choose_result(f, isbns_with_metadata)
