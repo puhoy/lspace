@@ -19,13 +19,17 @@ isbn_lookup = 'lookup by isbn'
 # specify_manually = 'specify manually'
 skip = 'skip'
 
-choice_functions = {
-    run_search: _run_search,
-    isbn_lookup: lookup_isbn,
-    skip: skip_book
+other_choices = {
+    'q': dict(
+        function=_run_search,
+        explanation=run_search),
+    'i': dict(
+        function=lookup_isbn,
+        explanation=isbn_lookup),
+    's': dict(
+        function=skip_book,
+        explanation=skip)
 }
-
-other_choices = list(choice_functions.keys())
 
 
 def guided_import(path, skip_library_check, move):
@@ -60,11 +64,11 @@ def guided_import(path, skip_library_check, move):
 
         logging.debug('choice was %s' % choice)
 
-        while choice in other_choices:
+        while choice in list(other_choices.keys()):
             # if choice is one of "other choices", its not one of the results,
             # but one of the strings mapped to functions
 
-            function_that_gets_new_choices = choice_functions.get(choice)
+            function_that_gets_new_choices = other_choices.get(choice)['function']
             new_results = function_that_gets_new_choices()
 
             if new_results is not False:
@@ -85,36 +89,51 @@ def guided_import(path, skip_library_check, move):
 
 def choose_result(file_type_object, isbns_with_metadata):
     if not isbns_with_metadata:
-        click.echo('no results found :(')
-    isbns_with_metadata += other_choices
+        click.secho('no results found :(', fg='yellow')
+
     formatted_choices = format_metadata_choices(
         isbns_with_metadata)
 
-    click.echo(''.join(formatted_choices))
+    click.echo(''.join(formatted_choices.values()))
 
-    ret = click.prompt('choose result for %s' % file_type_object.filename, type=click.IntRange(
-        min=1,
-        max=len(formatted_choices)))
+    choices = list(formatted_choices.keys())
 
-    idx = ret - 1
-    choice = isbns_with_metadata[idx]
+    ret = click.prompt('choose result for %s' % file_type_object.filename,
+                       type=click.Choice(choices))
+    if ret in list(other_choices.keys()):
+        choice = ret
+    else:
+        try:
+            idx = int(ret) - 1
+            choice = isbns_with_metadata[idx]
+        except Exception as e:
+            logger.exception('cant convert %s to int!' % ret, exc_info=True)
+            return False
+
     return choice
 
 
-def format_metadata_choices(isbns_with_metadata):
+def format_metadata_choices(isbns_with_metadata) -> dict:
     isbns_with_metadata = copy.deepcopy(isbns_with_metadata)
 
-    formatted_metadata = []
+    formatted_metadata = {
+        # 'choice': 'str shown to user'
+    }
     for idx, meta in enumerate(isbns_with_metadata):
         logger.info('adding %s' % meta)
 
-        if type(meta) == dict:
-            authors = ', '.join([author for author in meta.pop('Authors', [])])
-            title = meta.pop('Title')
-            formatted_metadata.append(f'\n{idx + 1}: {authors} - {title}\n' + yaml.dump(meta, allow_unicode=True))
+        authors = ', '.join([author for author in meta.pop('Authors', [])])
+        title = meta.pop('Title')
+        formatted_metadata[str(idx + 1)] = \
+            f'\n{idx + 1}: {authors} - {title}\n' + yaml.dump(meta, allow_unicode=True)
 
-        else:
-            formatted_metadata.append(yaml.dump({idx + 1: meta}, allow_unicode=True))
+        # otherwise its one of the other options, like search etc
+    for key, val in other_choices.items():
+        formatted_metadata[key] = \
+            yaml.dump({
+                key: val['explanation']},
+                allow_unicode=True)
+
     logger.debug('formatted data is %s' % formatted_metadata)
     return formatted_metadata
 
@@ -123,7 +142,7 @@ def _import(file_type_object, choice, move_file):
     path_in_library = _copy_to_library(file_type_object, choice, move_file)
     if path_in_library:
         book = add_book_to_db(file_type_object, choice, path_in_library)
-        click.secho('imported %s - %s' % (book.authors_names, book.title))
+        click.secho('imported %s - %s' % (book.authors_names, book.title), fg='green')
         return book
     else:
-        click.secho('could not import %s' % file_type_object.path)
+        click.secho('could not import %s' % file_type_object.path, fg='red')

@@ -95,7 +95,7 @@ class FileTypeBase:
     def guess_from_filename(self):
         clean_filename = self._clean_filename()
         logger.info('looking for %s' % clean_filename)
-        results = isbnlib.goom(clean_filename)
+        results = query_google_books(clean_filename)
         logger.debug('results: %s' % results)
         return results
 
