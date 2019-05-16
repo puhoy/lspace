@@ -1,4 +1,4 @@
-# L-Space
+# L-space
 
 a cli ebook manager built around [isbnlib](https://github.com/xlcnd/isbnlib)
 
@@ -75,3 +75,6 @@ would convert all books matching on QUERY to 'mobi' and export them to ~/some/fo
 
 to actually export to another format, you need "ebook-convert", which is part of [calibre](https://calibre-ebook.com/)!
 
+## why "L-space"?
+
+its named after discworlds [library-space](https://en.wikipedia.org/wiki/List_of_dimensions_of_the_Discworld#L-space) dimension :)
