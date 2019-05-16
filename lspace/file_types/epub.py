@@ -2,6 +2,7 @@ from typing import List
 
 import ebooklib
 import html2text
+import isbnlib
 from ebooklib import epub
 
 from ._base import FileTypeBase
@@ -13,7 +14,6 @@ class Epub(FileTypeBase):
     def __init__(self, path):
         super().__init__(path)
         self.book = epub.read_epub(path)
-
 
     def get_text(self) -> List[str]:
         text = []
@@ -43,5 +43,10 @@ class Epub(FileTypeBase):
         _isbn = self.book.get_metadata('DC', 'identifier')
         # [('Ratio', {})]
         if _isbn:
-            return _isbn[0][0]
+            isbn = _isbn[0][0]
+            if isbnlib.notisbn(isbn):
+                return None
+            if isbnlib.is_isbn10(isbn):
+                return isbnlib.to_isbn13(isbn)
+            return isbn
         return None

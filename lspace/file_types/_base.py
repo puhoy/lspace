@@ -69,8 +69,11 @@ class FileTypeBase:
         
         # try from author + title in metadata:
         logger.info('getting from author + title...')
-        if self.get_author() and self.get_title():
-            results = query_google_books(self._clean_filename())
+        if self.get_title():
+            search_str = self._filter_symbols(self.get_title())
+            if self.get_author():
+                search_str = f'{self._filter_symbols(self.get_author())} {search_str}'
+            results = query_google_books(search_str)
             if results:
                 logger.info('found isbns from author + title...')
                 return results
@@ -83,12 +86,15 @@ class FileTypeBase:
         
         return []
 
+    def _filter_symbols(self, s: str):
+        whitelist = string.ascii_letters + string.digits + ' '
+        clean_string = ''.join(
+            c if c in whitelist else ' ' for c in s)
+        return clean_string
+
     def _clean_filename(self):
         filename, extension = os.path.splitext(self.filename)
-
-        whitelist = string.ascii_letters + string.digits + ' '
-        clean_filename = ''.join(
-            c if c in whitelist else ' ' for c in filename)
+        clean_filename = self._filter_symbols(filename)
 
         return clean_filename
 
