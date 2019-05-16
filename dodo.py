@@ -1,5 +1,4 @@
 from doit.tools import PythonInteractiveAction
-from doit.action import CmdAction
 
 
 def task_build():

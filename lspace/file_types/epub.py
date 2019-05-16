@@ -8,7 +8,7 @@ from ._base import FileTypeBase
 
 
 class Epub(FileTypeBase):
-    extenstion = '.epub'
+    extension = '.epub'
 
     def __init__(self, path):
         super().__init__(path)

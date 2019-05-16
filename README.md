@@ -32,6 +32,7 @@ this will setup a new configuration file, which you can edit to specify the stru
 ### importing
 
 `lspace import path/to/ebook.epub`
+
 `lspace import path/to/folder/*`
 
 ### searching your library
@@ -62,6 +63,15 @@ would return return
 this command will ask you before it actually deletes stuff :)
 
     Peter Tyson - Getting Started With Dwarf Fortress
-    /home/meatpuppet/library/peter-tyson/getting-started-with-dwarf-fortress.epub
+    /home/USER/library/peter-tyson/getting-started-with-dwarf-fortress.epub
     delete this book from library? [y/N]:
+
+### exporting books
+
+
+`lspace export QUERY ~/some/folder/ --format mobi`
+
+would convert all books matching on QUERY to 'mobi' and export them to ~/some/folder
+
+to actually export to another format, you need "ebook-convert", which is part of [calibre](https://calibre-ebook.com/)!
 

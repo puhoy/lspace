@@ -31,4 +31,9 @@ class Book(db.Model):
     def authors_names(self) -> str:
         return ', '.join(author.name for author in self.authors)
 
+    @property
+    def extension(self) -> str:
+        filename, file_extension = os.path.splitext(self.full_path)
+        return file_extension
+
 
