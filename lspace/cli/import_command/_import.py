@@ -4,67 +4,55 @@ import logging
 import click
 import yaml
 
-from lspace.cli.import_command.peek_function import peek_function
 from lspace.cli.import_command.add_book_to_db import add_book_to_db
 from lspace.cli.import_command.copy_to_library import _copy_to_library
-from lspace.cli.import_command.lookup_isbn_function import lookup_isbn_function
-from lspace.cli.import_command.skip_book_function import skip_book_function
-from lspace.cli.import_command.run_search_function import run_search_function
 
 from lspace.file_types import get_file_type_class
 from lspace.models import Book
 
+from lspace.cli.import_command.options import other_choices
+
 logger = logging.getLogger(__name__)
 
-run_search = 'run another query'
-isbn_lookup = 'lookup by isbn'
-# specify_manually = 'specify manually'
-skip = 'skip'
-peek = 'peek in the text'
-next_search = 'try another search from file'
+
+def bold(s):
+    return click.style(s, bold=True)
 
 
-def try_next_results(file_type_object_searcher, *args, **kwargs):
-    return next(file_type_object_searcher)
+def search_method_generator(methods):
+    while True:
+        got_something = False
+        for description, find_function in methods.items():
+            click.echo(bold(description))
+            res = find_function()
+            if res:
+                got_something = True
+                yield res
+            else:
+                click.echo('no results :(')
 
-
-other_choices = {
-    'q': dict(
-        function=run_search_function,
-        explanation=run_search),
-    'i': dict(
-        function=lookup_isbn_function,
-        explanation=isbn_lookup),
-    's': dict(
-        function=skip_book_function,
-        explanation=skip),
-    'p': dict(
-        function=peek_function,
-        explanation=peek),
-    't': dict(
-        function=try_next_results,
-        explanation=next_search)
-}
+        if not got_something:
+            yield []
 
 
 def guided_import(path, skip_library_check, move):
-    click.echo('processing %s' % path)
+    click.echo(bold('importing ') + path)
     FileClass = get_file_type_class(path)
     if FileClass:
         try:
             f = FileClass(path)
         except Exception as e:
-            logger.error("error reading %s" % path, exc_info=True)
-            click.secho("error reading %s" % path, fg='red')
+            logger.exception(f'error reading {path}', exc_info=True)
+            click.secho(f'error reading {path}', fg='red')
             return
 
         if not skip_library_check and Book.query.filter_by(md5sum=f.get_md5()).first():
-            click.echo('%s already imported, skipping...' % path)
+            click.echo(bold('already imported') + ', skipping...')
             return
 
-        click.echo('getting metadata for %s' % path)
-        file_type_object_searcher = f.find_metadata()
-        isbns_with_metadata = next(file_type_object_searcher)
+        search_generator = search_method_generator(f.get_find_functions())
+
+        isbns_with_metadata = next(search_generator)
 
         if len(isbns_with_metadata) == 0:
             click.echo('could not find any isbn or metadata for %s' % f.filename)
@@ -73,15 +61,16 @@ def guided_import(path, skip_library_check, move):
         else:
             choice = choose_result(f, isbns_with_metadata)
 
-        logging.debug('choice was %s' % choice)
+        logger.debug('choice was %s' % choice)
 
         while choice in list(other_choices.keys()):
             # if choice is one of "other choices", its not one of the results,
             # but one of the strings mapped to functions
 
             function_that_gets_new_choices = other_choices.get(choice)['function']
-            isbns_with_metadata = function_that_gets_new_choices(file_type_object=f, old_choices=isbns_with_metadata,
-                                                                 file_type_object_searcher=file_type_object_searcher)
+            isbns_with_metadata = function_that_gets_new_choices(file_type_object=f,
+                                                                 old_choices=isbns_with_metadata,
+                                                                 search_generator=search_generator)
 
             if isbns_with_metadata is not False:
                 choice = choose_result(f, isbns_with_metadata)

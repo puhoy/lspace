@@ -5,9 +5,6 @@ import click
 from lspace.cli.import_command._import import guided_import
 from lspace.cli.import_command.add_book_to_db import add_book_to_db
 from lspace.cli.import_command.copy_to_library import _copy_to_library
-from lspace.cli.import_command.lookup_isbn_function import lookup_isbn_function
-
-from lspace.cli.import_command.run_search_function import run_search_function as _run_search
 
 from .. import cli
 

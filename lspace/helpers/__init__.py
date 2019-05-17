@@ -41,8 +41,6 @@ def get_metadata_for_isbn(isbn, service='openl') -> dict:
             isbnlib.dev._exceptions.DataNotFoundAtServiceError
             ):
         meta = {}
-    import json
-    print('isbn meta', json.dumps(meta, indent=2))
     return meta
 
 
@@ -67,8 +65,6 @@ def query_google_books(words):
     logger.debug('query google books for %s' % words)
     try:
         results = isbnlib.goom(words)
-        import json
-        print('goob meta', json.dumps(results, indent=2))
 
     except isbnlib.dev._exceptions.NoDataForSelectorError as e:
         results = []
