@@ -25,10 +25,10 @@ def add_book_to_db(file_type_object, result, path_in_library):
         db.session.commit()
 
     title = result['Title']
-    isbn13 = result['ISBN-13']
-    publisher = result['Publisher']
-    year = result['Year']
-    language = result['Language']
+    isbn13 = result.get('ISBN-13', '')
+    publisher = result.get('Publisher', '')
+    year = result.get('Year', '')
+    language = result.get('Language', '')
 
     book = db.session.query(Book).filter_by(isbn13=isbn13).first()
     if not book:

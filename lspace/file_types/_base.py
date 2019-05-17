@@ -5,6 +5,7 @@ import string
 
 import isbnlib
 
+from lspace.helpers import preprocess_isbns
 from ..helpers import query_isbn_data, query_google_books
 
 logger = logging.getLogger(__name__)
@@ -105,21 +106,7 @@ class FileTypeBase:
         logger.debug('results: %s' % results)
         return results
 
-    def _preprocess_isbns(self, isbns):
-        """
 
-        :param isbns: isbns in different formats
-        :return: canonical isbn13s
-        """
-        canonical_isbns = []
-        for isbn in isbns:
-            if not isbnlib.notisbn(isbn, level='strict'):
-                if isbnlib.is_isbn10(isbn):
-                    isbn = isbnlib.to_isbn13(isbn)
-                isbn = isbnlib.get_canonical_isbn(isbn)
-                canonical_isbns.append(isbn)
-        canonical_isbns = set(canonical_isbns)
-        return list(canonical_isbns)
 
     def get_isbns_from_text(self):
         pages = self.get_text()
@@ -128,7 +115,7 @@ class FileTypeBase:
         isbns = isbnlib.get_isbnlike(pages_as_str, level='normal')
 
         # print('unprocessed isbns: %s' % isbns)
-        canonical_isbns = self._preprocess_isbns(isbns)
+        canonical_isbns = preprocess_isbns(isbns)
 
         # print('canonical isbns: %s' % canonical_isbns)
         return canonical_isbns

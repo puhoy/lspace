@@ -1,6 +1,10 @@
-import click
+from copy import deepcopy
 
-from lspace.helpers import query_google_books
+import click
+import yaml
+
+from lspace.file_types import FileTypeBase
+from lspace.helpers import query_google_books, preprocess_isbns
 from lspace.helpers import query_isbn_data
 
 
@@ -31,6 +35,54 @@ def lookup_isbn_function(*args, **kwargs):
     return []
 
 
+def manual_import(file_type_object: FileTypeBase, *args, **kwargs):
+    _edit_dict = dict(
+        Authors=['', ],
+        Title='',
+        ISBN='',
+        Publisher='',
+        Year='',
+        Language='',
+    )
+
+    edit_dict = deepcopy(_edit_dict)
+
+    while True:
+        text = f'# import {file_type_object.path}\n'
+        text += f'# only the title is needed, but you probably want to specify more :)\n\n'
+        text += yaml.dump(edit_dict)
+
+        result = click.edit(text, require_save=True)
+        if not result:
+            click.prompt('no data! did you save?')
+        else:
+            result = yaml.load(result, Loader=yaml.FullLoader)
+            if not result['Title']:
+                choice = ''
+                while choice not in ['e', 'r']:
+                    choice = click.prompt('title is needed! \n'
+                                          'e: edit\n'
+                                          'p: ' + other_choices['p']['explanation'] + '\n' +
+                                          'r: restart with empty form\n',
+                                          type=click.Choice(['e', 'r', 'p']), default='e')
+                    if choice == 'e':
+                        edit_dict = result
+
+                    elif choice == 'r':
+                        edit_dict = deepcopy(_edit_dict)
+                    else:
+                        other_choices['p']['function'](file_type_object, [])
+            else:
+                isbn = result.get('ISBN')
+                if isbn:
+                    isbns = preprocess_isbns([isbn])
+                    if len(isbns) == 1:
+                        isbn = isbns[0]
+                        result['ISBN-13'] = isbn
+
+                return [result]
+
+
 other_choices = {
     'q': dict(
         function=run_search_function,
@@ -44,6 +96,9 @@ other_choices = {
     't': dict(
         function=try_next_results,
         explanation='try to get more results'),
+    'm': dict(
+        function=manual_import,
+        explanation='import manually'),
     's': dict(
         function=skip_book_function,
         explanation='skip this book'),
