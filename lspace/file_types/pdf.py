@@ -45,10 +45,13 @@ class PDF(FileTypeBase):
         return None
 
     def get_title(self):
-        if (self.xmp_metadata and
-                self.xmp_metadata.dc_title and
-                self.xmp_metadata.dc_title.get('x-default', False)):
-            return self.xmp_metadata.dc_title.get('x-default', False)
+        try:
+            if (self.xmp_metadata and
+                    self.xmp_metadata.dc_title and
+                    self.xmp_metadata.dc_title.get('x-default', False)):
+                return self.xmp_metadata.dc_title.get('x-default', False)
+        except AttributeError:
+            pass
 
         if self.metadata:
             return self.metadata.title

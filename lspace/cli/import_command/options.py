@@ -37,8 +37,8 @@ def lookup_isbn_function(*args, **kwargs):
 
 def manual_import(file_type_object: FileTypeBase, *args, **kwargs):
     _edit_dict = dict(
-        Authors=['', ],
         Title='',
+        Authors=['', ],
         ISBN='',
         Publisher='',
         Year='',
@@ -50,11 +50,11 @@ def manual_import(file_type_object: FileTypeBase, *args, **kwargs):
     while True:
         text = f'# import {file_type_object.path}\n'
         text += f'# only the title is needed, but you probably want to specify more :)\n\n'
-        text += yaml.dump(edit_dict)
+        text += yaml.dump(edit_dict, sort_keys=False)
 
         result = click.edit(text, require_save=True)
         if not result:
-            click.prompt('no data! did you save?')
+            click.pause('no data! did you save?')
         else:
             result = yaml.load(result, Loader=yaml.FullLoader)
             if not result['Title']:

@@ -73,14 +73,18 @@ def query_google_books(words):
 
 def query_db(query, books=True, authors=True):
     from ..models import Book, Author
-    if not query or (len(query) == 1 and not query[0]):
-        results = Book.query.all()
+    if not query or (len(query) == 1 and not query[0]):  # in case of ('', )
+        return Book.query.all()
     else:
-        results = Book.query.whooshee_search(' '.join(query)).all()
-        author_results = Author.query.whooshee_search(' '.join(query)).all()
-        for author in author_results:
-            for book in author.books:
-                results.append(book)
+        results = []
+        joined_query = ' '.join(query)
+        if books:
+            results = Book.query.whooshee_search(joined_query, match_substrings=False).all()
+        if authors:
+            author_results = Author.query.whooshee_search(joined_query, match_substrings=False).all()
+            for author in author_results:
+                for book in author.books:
+                    results.append(book)
     return results
 
 
