@@ -5,6 +5,7 @@ import click
 import yaml
 
 from lspace.cli.import_command.add_book_to_db import add_book_to_db
+from lspace.cli.import_command.check_if_in_library import check_if_in_library
 from lspace.cli.import_command.copy_to_library import _copy_to_library
 
 from lspace.file_types import get_file_type_class
@@ -35,7 +36,7 @@ def search_method_generator(methods):
             yield []
 
 
-def guided_import(path, skip_library_check, move):
+def import_wizard(path, skip_library_check, move):
     click.echo(bold('importing ') + path)
     FileClass = get_file_type_class(path)
     if FileClass:
@@ -140,6 +141,20 @@ def format_metadata_choices(isbns_with_metadata) -> dict:
 
 
 def _import(file_type_object, choice, move_file):
+    logger.debug('importing %s, %s' % (file_type_object, choice))
+    logger.debug(file_type_object)
+
+    similar_books = check_if_in_library(choice)
+    if similar_books:
+        click.echo(bold('found similar books in library:'))
+        for book in similar_books:
+            click.echo(bold(f'{book.authors_names} - {book.title}'))
+            click.echo(f'isbn: {book.isbn13}')
+            click.echo(f'{book.path}\n')
+        if not click.confirm('import anyway?'):
+            click.echo(bold('skipping %s' % file_type_object.path))
+            return
+
     path_in_library = _copy_to_library(file_type_object, choice, move_file)
     if path_in_library:
         book = add_book_to_db(file_type_object, choice, path_in_library)

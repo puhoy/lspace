@@ -22,7 +22,6 @@ def add_book_to_db(file_type_object, result, path_in_library):
             author = Author(name=author_name)
             db.session.add(author)
         authors.append(author)
-        db.session.commit()
 
     title = result['Title']
     isbn13 = result.get('ISBN-13', '')
@@ -30,19 +29,17 @@ def add_book_to_db(file_type_object, result, path_in_library):
     year = result.get('Year', '')
     language = result.get('Language', '')
 
-    book = db.session.query(Book).filter_by(isbn13=isbn13).first()
-    if not book:
-        book = Book(
-            title=title,
-            authors=authors,
-            publisher=publisher,
-            year=year,
-            language=language,
-            md5sum=file_type_object.get_md5(),
-            path=path_in_library,
-            isbn13=isbn13
-        )
-        logger.info('adding book %s' % book)
-        db.session.add(book)
-        db.session.commit()
+    book = Book(
+        title=title,
+        authors=authors,
+        publisher=publisher,
+        year=year,
+        language=language,
+        md5sum=file_type_object.get_md5(),
+        path=path_in_library,
+        isbn13=isbn13
+    )
+    logger.info('adding book %s' % book)
+    db.session.add(book)
+    db.session.commit()
     return book

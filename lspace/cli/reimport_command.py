@@ -2,7 +2,7 @@ import os
 import click
 import shutil
 
-from lspace.cli.import_command import guided_import
+from lspace.cli.import_command import import_wizard
 from . import cli
 from ..helpers import query_db
 from ..app import db
@@ -21,9 +21,11 @@ def reimport(query):
         click.echo(f'{authors_str} - {result.title}')
         click.echo(f'{result.full_path}')
         if click.confirm('reimport this?'):
-            new_result = guided_import(result.full_path, skip_library_check=True, move=True)
+            # delete without commit to exclude this book from db check
+            db.session.delete(result)
+            new_result = import_wizard(result.full_path, skip_library_check=True, move=True)
             if new_result:
-                db.session.delete(result)
                 db.session.commit()
             else:
                 click.secho('no new entry - keeping the old one!')
+                db.session.rollback()

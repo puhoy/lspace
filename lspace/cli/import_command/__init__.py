@@ -2,7 +2,7 @@ import logging
 
 import click
 
-from lspace.cli.import_command._import import guided_import
+from lspace.cli.import_command._import import import_wizard
 from lspace.cli.import_command.add_book_to_db import add_book_to_db
 from lspace.cli.import_command.copy_to_library import _copy_to_library
 
@@ -18,4 +18,4 @@ logger = logging.getLogger(__name__)
 @click.option('--move', help='move imported files instead copying', default=False, is_flag=True)
 def import_command(document_path, skip_library_check, move):
     for path in document_path:
-        guided_import(path, skip_library_check, move)
+        import_wizard(path, skip_library_check, move)
