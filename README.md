@@ -7,6 +7,9 @@ currently supports epub and pdf
 
 the whole thing is pretty much just a weekend project, so i would be happy about reported issues or pull requests!
 
+[![Build Status](https://travis-ci.org/puhoy/lspace.svg?branch=master)](https://travis-ci.org/puhoy/lspace)
+
+[![codecov](https://codecov.io/gh/puhoy/lspace/branch/master/graph/badge.svg)](https://codecov.io/gh/puhoy/lspace)
 
 ## requirements
 
