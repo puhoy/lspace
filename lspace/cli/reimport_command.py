@@ -1,11 +1,9 @@
-import os
 import click
-import shutil
 
 from lspace.cli.import_command import import_wizard
 from . import cli
+from .. import db
 from ..helpers import query_db
-from ..app import db
 
 
 @cli.command(help='reimport books in library')

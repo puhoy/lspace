@@ -1,9 +1,9 @@
 import os
 
-from sqlalchemy import Column, Integer, String, Table
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
-from ..app import db, whooshee
+from .. import db, whooshee
 from ..config import library_path
 
 @whooshee.register_model('title', 'language', 'isbn13')

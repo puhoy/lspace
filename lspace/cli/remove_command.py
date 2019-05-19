@@ -3,7 +3,7 @@ import click
 
 from . import cli
 from ..helpers import query_db
-from ..app import db
+from .. import db
 
 
 @cli.command(help='remove books from library')

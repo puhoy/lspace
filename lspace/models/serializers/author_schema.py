@@ -1,4 +1,4 @@
-from lspace.app import marshmallow
+from lspace import marshmallow
 from lspace.models import Author
 
 

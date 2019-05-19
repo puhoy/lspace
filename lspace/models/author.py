@@ -2,7 +2,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
 
-from ..app import db, whooshee
+from .. import db, whooshee
 
 @whooshee.register_model('name')
 class Author(db.Model):

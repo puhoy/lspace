@@ -1,6 +1,6 @@
 import logging
 
-from lspace.app import db
+from lspace import db
 from lspace.models import Author, Book
 
 logger = logging.getLogger(__name__)

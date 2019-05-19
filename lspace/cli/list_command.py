@@ -1,10 +1,9 @@
 import os
+
 import click
 
-from ..models import Author, Book
 from . import cli
-from ..config import user_config, library_path
-
+from ..config import library_path
 from ..helpers import query_db
 
 

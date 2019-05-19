@@ -3,15 +3,18 @@ import os
 import click
 import yaml
 
-from .. import CONFIG_FILE, app_dir
+from .. import app
 from ..helpers import get_default_config
 from . import cli
 
 
 @cli.command(help='generate a new config')
 def init():
+    app_dir = app.config['APP_DIR']
+    config_path = app.config['CONFIG_PATH']
+
     os.makedirs(app_dir, exist_ok=True)
-    config_path = os.path.join(app_dir, CONFIG_FILE)
+
     if os.path.exists(config_path):
         click.prompt('config exists - override?',
                      default=False, confirmation_prompt=True)

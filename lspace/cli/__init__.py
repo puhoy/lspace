@@ -1,7 +1,6 @@
-import click
+from flask.cli import AppGroup
 
-from .. import APP_NAME
-from ..app import app, cli_group as cli
+cli = AppGroup('cli')
 
 from .import_command import import_command
 from .init_command import init

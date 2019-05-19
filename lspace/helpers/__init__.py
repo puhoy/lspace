@@ -1,11 +1,11 @@
 import logging
 import os
 
+import click
 import isbnlib
 import yaml
 
-from .. import CONFIG_FILE
-from .. import app_dir
+from .. import APP_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -16,12 +16,11 @@ def get_default_config():
     with open(os.path.join(this_dir, path_from_here, 'default_conf.yaml'), 'r') as default_config_file:
         default_config = yaml.load(default_config_file, Loader=yaml.SafeLoader)
         default_config['database_path'] = default_config['database_path'].format(
-            APP_DIR=app_dir)
+            APP_DIR=click.get_app_dir(APP_NAME))
     return default_config
 
 
-def read_config():
-    config_path = os.path.join(app_dir, CONFIG_FILE)
+def read_config(config_path):
     if os.path.isfile(config_path):
         with open(config_path, 'r') as config:
             conf = yaml.load(config, Loader=yaml.SafeLoader)
