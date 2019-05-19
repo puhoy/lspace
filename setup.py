@@ -35,6 +35,9 @@ requirements = [
 dev_requirements = [
     "ipython==7.5.0",
     "doit==0.31.1"
+    "pytest==4.5.0",
+    "pytest-cov==2.7.1",
+    "pytest-cover==3.0.0"
 ]
 
 setup(
@@ -55,5 +58,16 @@ setup(
     extras_require={
         'dev': dev_requirements
     },
-    install_requires=requirements
+    install_requires=requirements,
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Console',
+        "Intended Audience :: End Users/Desktop",
+        "Natural Language :: English",
+        "Topic :: Utilities",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3",
+    ],
 )
