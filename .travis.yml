@@ -10,3 +10,7 @@ python:
 install: "pip install -e .[dev]"
 
 script: pytest
+
+# Push the results back to codecov
+after_success:
+- codecov

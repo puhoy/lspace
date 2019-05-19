@@ -37,7 +37,8 @@ dev_requirements = [
     "doit==0.31.1",
     "pytest==4.5.0",
     "pytest-cov==2.7.1",
-    "pytest-cover==3.0.0"
+    "pytest-cover==3.0.0",
+    "codecov==2.0.1"
 ]
 
 setup(
