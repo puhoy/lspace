@@ -34,7 +34,7 @@ requirements = [
 
 dev_requirements = [
     "ipython==7.5.0",
-    "doit==0.31.1"
+    "doit==0.31.1",
     "pytest==4.5.0",
     "pytest-cov==2.7.1",
     "pytest-cover==3.0.0"
