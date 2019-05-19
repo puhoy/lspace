@@ -19,9 +19,10 @@ def _copy_to_library(file_type_object, result, move_file) -> str:
     :return:
     """
     # prepare the fields for path building
-    author_slugs = [slugify(author_name) for author_name in result['Authors']]
+    author_slugs = [slugify(author_name) for author_name in result['Authors'] if author_name]
+
     if not author_slugs:
-        author_slugs = ['UNKNOWN AUTHOR']
+        author_slugs = ['UNKNOWN-AUTHOR']
 
     authors = '_'.join(author_slugs)
     title = slugify(result['Title'])
