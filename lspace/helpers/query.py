@@ -1,16 +1,28 @@
+import json
+
 import isbnlib
 
+from lspace import db
 from lspace.helpers import logger
+from lspace.models.meta_cache import MetaCache
 
 
 def _get_metadata_for_isbn(isbn, service='openl') -> dict:
-    try:
-        meta = isbnlib.meta(isbn, service=service, cache='default')
-    except (isbnlib.dev._exceptions.NoDataForSelectorError,
-            isbnlib._exceptions.NotValidISBNError,
-            isbnlib.dev._exceptions.DataNotFoundAtServiceError
-            ):
-        meta = {}
+    cached_meta = MetaCache.query.filter_by(isbn=isbn, service=service).first()
+    if cached_meta:
+        return json.loads(cached_meta.data)
+    else:
+        try:
+            meta = isbnlib.meta(isbn, service=service, cache='default')
+        except (isbnlib.dev._exceptions.NoDataForSelectorError,
+                isbnlib._exceptions.NotValidISBNError,
+                isbnlib.dev._exceptions.DataNotFoundAtServiceError
+                ):
+            meta = {}
+        new_meta = MetaCache(isbn=isbn, service=service, data=json.dumps(meta))
+
+        db.session.add(new_meta)
+        db.session.commit()
     return meta
 
 

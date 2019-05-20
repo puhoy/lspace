@@ -11,4 +11,4 @@ from .reimport_command import reimport
 from .export_command import export
 from .version_command import version
 
-# from .db_command import migrate, upgrade, init
+#from .db_command import db

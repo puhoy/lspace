@@ -6,7 +6,7 @@ import string
 import isbnlib
 
 from lspace.helpers import preprocess_isbns
-from ..helpers import query_isbn_data, query_google_books
+from lspace.helpers.query import query_isbn_data, query_google_books
 
 logger = logging.getLogger(__name__)
 
