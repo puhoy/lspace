@@ -21,9 +21,12 @@ class PDF(FileTypeBase):
         # printing number of pages in pdf file
         for page_idx in range(self.pdf_reader.numPages):
             page = self.pdf_reader.getPage(page_idx)
-
-            extracted_text = page.extractText()
-            pages.append(extracted_text)
+            try:
+                extracted_text = page.extractText()
+                pages.append(extracted_text)
+            except KeyError:
+                # KeyError: '/Contents'
+                pass
 
         # if true, there was at least one page with text
         if True in [bool(page) for page in pages]:
