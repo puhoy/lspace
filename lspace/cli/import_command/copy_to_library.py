@@ -4,8 +4,8 @@ import os
 from shutil import copyfile, move
 from slugify import slugify
 
-from lspace.config import library_path, user_config
 from lspace.helpers import find_unused_path
+from flask import current_app
 
 logger = logging.getLogger(__name__)
 
@@ -30,8 +30,8 @@ def _copy_to_library(file_type_object, result, move_file) -> str:
     logger.debug('author slug: %s' % authors)
     logger.debug('title slug: %s' % title)
 
-    path_in_library = find_unused_path(library_path, user_config['file_format'], authors, title, file_type_object.extension)
-    target_path = os.path.join(library_path, path_in_library)
+    path_in_library = find_unused_path(current_app.config['LIBRARY_PATH'], current_app.config['USER_CONFIG']['file_format'], authors, title, file_type_object.extension)
+    target_path = os.path.join(current_app.config['LIBRARY_PATH'], path_in_library)
 
     if not target_path:
         logger.error('could not find a path in the library for %s' %

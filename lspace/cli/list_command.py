@@ -2,9 +2,9 @@ import os
 
 import click
 
-from . import cli
-from ..config import library_path
-from ..helpers import query_db
+from lspace.cli import cli
+from lspace.helpers import query_db
+from flask import current_app
 
 
 @cli.command(name='list', help='query your database')
@@ -16,7 +16,7 @@ def _list(query, path, details):
 
     if path:
         for result in results:
-            click.echo(f'{os.path.join(library_path, result.path)}')
+            click.echo(f'{os.path.join(current_app.config["LIBRARY_PATH"], result.path)}')
         return
 
     if details:

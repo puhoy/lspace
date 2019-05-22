@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from .. import db, whooshee
-from ..config import library_path
+from flask import current_app
 
 @whooshee.register_model('title', 'language', 'isbn13')
 class Book(db.Model):
@@ -25,7 +25,7 @@ class Book(db.Model):
 
     @property
     def full_path(self) -> str:
-        return f'{os.path.join(library_path, self.path)}'
+        return f'{os.path.join(current_app.config["LIBRARY_PATH"], self.path)}'
 
     @property
     def authors_names(self) -> str:

@@ -1,9 +1,9 @@
 import os
 import click
 
-from . import cli
-from ..helpers import query_db
-from .. import db
+from lspace.cli import cli
+from lspace.helpers import query_db
+from lspace import db
 
 
 @cli.command(help='remove books from library')

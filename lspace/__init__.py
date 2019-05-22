@@ -19,14 +19,15 @@ whooshee = Whooshee()
 marshmallow = Marshmallow()
 
 
-def create_app():
+def create_app(config_path=None, app_dir=None):
     from .helpers import read_config
 
     app = Flask(__name__)
 
-    app.config['APP_DIR'] = click.get_app_dir(APP_NAME)
+    if not app_dir:
+        app_dir = click.get_app_dir(APP_NAME)
+    app.config['APP_DIR'] = app_dir
 
-    config_path = os.environ.get('LSPACE_CONFIG', False)
     if not config_path:
         config_path = os.path.join(app.config['APP_DIR'], 'config.yaml')
 
@@ -35,6 +36,8 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = app.config['USER_CONFIG']['database_path']
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['WHOOSHEE_DIR'] = os.path.join(app.config['APP_DIR'], 'whoosh_index')
+
+    app.config['LIBRARY_PATH'] = os.path.abspath(os.path.expanduser(app.config['USER_CONFIG']['library_path']))
 
     migration_dir = os.path.join(os.path.dirname(__file__), 'migrations')
 

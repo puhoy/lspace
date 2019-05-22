@@ -7,10 +7,10 @@ from typing import List
 import click
 from slugify import slugify
 
-from lspace.config import user_config
+from flask import current_app
 from lspace.models import Book
-from . import cli
-from ..helpers import query_db, find_unused_path
+from lspace.cli import cli
+from lspace.helpers import query_db, find_unused_path
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ def export(query, export_path, format):
             target_extension = result.extension
 
         target_in_export_path = find_unused_path(export_path,
-                                                 user_config['file_format'],
+                                                 current_app.config['USER_CONFIG']['file_format'],
                                                  authors_slug,
                                                  title_slug,
                                                  target_extension)

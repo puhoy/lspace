@@ -3,15 +3,17 @@ import os
 import click
 import yaml
 
-from .. import app
-from ..helpers import get_default_config
-from . import cli
+
+from lspace.helpers import get_default_config
+from lspace.cli import cli
 
 
 @cli.command(help='generate a new config')
 def init():
-    app_dir = app.config['APP_DIR']
-    config_path = app.config['CONFIG_PATH']
+    from flask import current_app
+
+    app_dir = current_app.config['APP_DIR']
+    config_path = current_app.config['CONFIG_PATH']
 
     os.makedirs(app_dir, exist_ok=True)
 
@@ -23,4 +25,5 @@ def init():
     with open(config_path, 'w') as config:
         yaml.dump(default_config, config)
     click.echo('written config file to %s' % config_path)
-    
+
+    return config_path
