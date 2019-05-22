@@ -1,11 +1,7 @@
 import logging
+import logging.config
 
-from flask import current_app
-
-
-def init_logging():
-    user_config = current_app.config['USER_CONFIG']
-
+def init_logging(loglevel='info'):
     logging.config.dictConfig({
         'version': 1,
         'disable_existing_loggers': False,
@@ -16,7 +12,7 @@ def init_logging():
         },
         'handlers': {
             'default': {
-                'level': user_config.get('loglevel', 'INFO').upper(),
+                'level': loglevel.upper(),
                 'class': 'logging.StreamHandler',
                 'formatter': 'default'
             },
@@ -24,7 +20,7 @@ def init_logging():
         'loggers': {
             '': {
                 'handlers': ['default'],
-                'level': user_config.get('loglevel', 'INFO').upper(),
+                'level': loglevel.upper(),
                 'propagate': True
             }
         }

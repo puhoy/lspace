@@ -5,7 +5,7 @@ import click
 import isbnlib
 import yaml
 
-from .. import APP_NAME
+from lspace import APP_NAME
 
 logger = logging.getLogger(__name__)
 
