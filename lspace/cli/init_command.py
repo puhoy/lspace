@@ -3,7 +3,6 @@ import os
 import click
 import yaml
 
-
 from lspace.helpers import get_default_config
 from lspace.cli import cli
 
@@ -18,8 +17,8 @@ def init():
     os.makedirs(app_dir, exist_ok=True)
 
     if os.path.exists(config_path):
-        click.prompt('config exists - override?',
-                     default=False, confirmation_prompt=True)
+        if not click.confirm('config exists - override?'):
+            return
 
     default_config = get_default_config()
     with open(config_path, 'w') as config:
