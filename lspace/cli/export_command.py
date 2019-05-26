@@ -2,13 +2,11 @@ import logging
 import os
 import shutil
 import subprocess
-from typing import List
 
 import click
 from slugify import slugify
 
 from flask import current_app
-from lspace.models import Book
 from lspace.cli import cli
 from lspace.helpers import query_db, find_unused_path
 
@@ -34,7 +32,7 @@ def export(query, export_path, format):
         # format and extension should both start with '.'
         format = '.' + format
 
-    results: List[Book] = query_db(query)
+    results = query_db(query)
     for result in results:
         author_slugs = [slugify(author.name) for author in result.authors]
         if not author_slugs:

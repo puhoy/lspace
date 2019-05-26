@@ -1,7 +1,5 @@
 import os
 
-from typing import Union
-
 from ._base import FileTypeBase
 from .pdf import PDF
 from .epub import Epub
@@ -11,7 +9,8 @@ mapping = {
     '.epub': Epub
 }
 
-def get_file_type_class(path) -> Union[PDF, Epub]:
+
+def get_file_type_class(path):
     filename, file_extension = os.path.splitext(path)
 
     file_class = mapping.get(file_extension, None)

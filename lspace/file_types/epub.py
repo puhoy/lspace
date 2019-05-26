@@ -1,4 +1,3 @@
-from typing import List
 
 import ebooklib
 import html2text
@@ -15,7 +14,8 @@ class Epub(FileTypeBase):
         super().__init__(path)
         self.book = epub.read_epub(path)
 
-    def get_text(self) -> List[str]:
+    def get_text(self):
+        # -> List[str]
         text = []
 
         for doc in self.book.get_items_of_type(ebooklib.ITEM_DOCUMENT):

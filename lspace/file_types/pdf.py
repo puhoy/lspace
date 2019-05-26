@@ -1,4 +1,3 @@
-from typing import List
 
 import PyPDF2 as pypdf
 
@@ -15,7 +14,8 @@ class PDF(FileTypeBase):
         self.metadata = self.pdf_reader.getDocumentInfo()
         self.xmp_metadata = self.pdf_reader.getXmpMetadata()
 
-    def get_text(self) -> List[str]:
+    def get_text(self):
+        #  -> List[str]
         pages = []
 
         # printing number of pages in pdf file
