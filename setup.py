@@ -35,6 +35,9 @@ requirements = [
 dev_requirements = [
     "ipython==7.5.0",
     "doit==0.31.1",
+]
+
+test_requirements = [
     "pytest==4.5.0",
     "pytest-cov==2.7.1",
     "pytest-cover==3.0.0",
@@ -57,7 +60,8 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     extras_require={
-        'dev': dev_requirements
+        'dev': dev_requirements,
+        'test': test_requirements
     },
     install_requires=requirements,
     classifiers=[
