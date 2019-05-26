@@ -27,8 +27,9 @@ def read_config(config_path):
 
     else:
         conf = {}
-
-    conf = {**get_default_config(), **conf}
+    
+    default_config = get_default_config()
+    conf = default_config.update(conf)
     return conf
 
 

@@ -32,16 +32,16 @@ requirements = [
     "Whoosh==2.7.4",
 ]
 
-dev_requirements = [
-    "ipython==7.5.0",
-    "doit==0.31.1",
-]
-
 test_requirements = [
     "pytest==4.5.0",
     "pytest-cov==2.7.1",
     "pytest-cover==3.0.0",
     "codecov==2.0.1"
+]
+
+dev_requirements = test_requirements + [
+    "ipython==7.5.0",
+    "doit==0.31.1",
 ]
 
 setup(
