@@ -35,7 +35,8 @@ def lookup_isbn_function(*args, **kwargs):
     return []
 
 
-def manual_import(file_type_object: FileTypeBase, *args, **kwargs):
+def manual_import(file_type_object, *args, **kwargs):
+    # type: (FileTypeBase, [], {}) -> [dict]
     _edit_dict = dict(
         Title='',
         Authors=['', ],
