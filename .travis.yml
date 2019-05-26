@@ -38,12 +38,6 @@ matrix:
       python: "3.6"
       dist: trusty
 
-    - name: "osx 2.7"
-      os: osx
-      osx_image: xcode8.3  # Python 3.7.2 running on macOS 10.14.3
-      language: shell       # 'language: python' is an error on Travis CI macOS
-      python: "2.7"
-
     - name: "osx 3.7"
       os: osx
       osx_image: xcode10.2  # Python 3.7.2 running on macOS 10.14.3
@@ -56,7 +50,7 @@ matrix:
       language: shell       # 'language: python' is an error on Travis CI macOS
       python: "3.6"
 
-install: pip3 install -e .[test] || pip install -e .[test]
+install: pip install -e .[test]
 
 # https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems
 script: python3 -m pytest || python -m pytest
