@@ -115,7 +115,8 @@ def choose_result(file_type_object, isbns_with_metadata):
     return choice
 
 
-def format_metadata_choices(isbns_with_metadata) -> dict:
+def format_metadata_choices(isbns_with_metadata):
+    # type: (dict) -> dict
     isbns_with_metadata = copy.deepcopy(isbns_with_metadata)
 
     formatted_metadata = {

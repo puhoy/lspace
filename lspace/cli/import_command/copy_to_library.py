@@ -6,11 +6,13 @@ from slugify import slugify
 
 from lspace.helpers import find_unused_path
 from flask import current_app
+from lspace.file_types._base import FileTypeBase
 
 logger = logging.getLogger(__name__)
 
 
-def _copy_to_library(file_type_object, result, move_file) -> str:
+def _copy_to_library(file_type_object, result, move_file):
+    # type: (FileTypeBase, dict, bool) -> str
     """
 
     :param file_type_object: wrapper for the file we want to import
@@ -30,7 +32,9 @@ def _copy_to_library(file_type_object, result, move_file) -> str:
     logger.debug('author slug: %s' % authors)
     logger.debug('title slug: %s' % title)
 
-    path_in_library = find_unused_path(current_app.config['LIBRARY_PATH'], current_app.config['USER_CONFIG']['file_format'], authors, title, file_type_object.extension)
+    path_in_library = find_unused_path(current_app.config['LIBRARY_PATH'],
+                                       current_app.config['USER_CONFIG']['file_format'], authors, title,
+                                       file_type_object.extension)
     target_path = os.path.join(current_app.config['LIBRARY_PATH'], path_in_library)
 
     if not target_path:

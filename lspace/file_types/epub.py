@@ -15,7 +15,7 @@ class Epub(FileTypeBase):
         self.book = epub.read_epub(path)
 
     def get_text(self):
-        # -> List[str]
+        # type: () -> [str]
         text = []
 
         for doc in self.book.get_items_of_type(ebooklib.ITEM_DOCUMENT):

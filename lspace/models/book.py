@@ -24,15 +24,18 @@ class Book(db.Model):
     path = Column(String(400))
 
     @property
-    def full_path(self) -> str:
+    def full_path(self):
+        # type: () -> str
         return os.path.join(current_app.config["LIBRARY_PATH"], self.path)
 
     @property
-    def authors_names(self) -> str:
+    def authors_names(self):
+        # type: () -> str
         return ', '.join(author.name for author in self.authors)
 
     @property
-    def extension(self) -> str:
+    def extension(self):
+        # type: () -> str
         filename, file_extension = os.path.splitext(self.full_path)
         return file_extension
 

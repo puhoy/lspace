@@ -7,7 +7,8 @@ from lspace.helpers import logger
 from lspace.models.meta_cache import MetaCache
 
 
-def _get_metadata_for_isbn(isbn, service='openl') -> dict:
+def _get_metadata_for_isbn(isbn, service='openl'):
+    # type: (str, str) -> dict
     cached_meta = MetaCache.query.filter_by(isbn=isbn, service=service).first()
     if cached_meta:
         return json.loads(cached_meta.data)
@@ -26,7 +27,8 @@ def _get_metadata_for_isbn(isbn, service='openl') -> dict:
     return meta
 
 
-def query_isbn_data(isbn_str) -> dict:
+def query_isbn_data(isbn_str):
+    # type: (str) -> dict
     if isbnlib.is_isbn10(isbn_str):
         isbn_str = isbnlib.to_isbn13(isbn_str)
 

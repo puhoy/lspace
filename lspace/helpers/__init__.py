@@ -33,7 +33,8 @@ def read_config(config_path):
     return config
 
 
-def get_metadata_for_isbn(isbn, service='openl') -> dict:
+def get_metadata_for_isbn(isbn, service='openl'):
+    # type: (str, str) -> dict
     try:
         meta = isbnlib.meta(isbn, service=service, cache='default')
     except (isbnlib.dev._exceptions.NoDataForSelectorError,
@@ -44,7 +45,8 @@ def get_metadata_for_isbn(isbn, service='openl') -> dict:
     return meta
 
 
-def query_isbn_data(isbn_str) -> dict:
+def query_isbn_data(isbn_str):
+    # type: (str) -> dict
     if isbnlib.is_isbn10(isbn_str):
         isbn_str = isbnlib.to_isbn13(isbn_str)
 
@@ -88,7 +90,8 @@ def query_db(query, books=True, authors=True):
     return results
 
 
-def find_unused_path(base_path, book_path_format, authors: str, title: str, extension: str) -> str:
+def find_unused_path(base_path, book_path_format, authors, title, extension):
+    # type: (str, str, str, str, str) -> str
     """
 
     :param base_path: 

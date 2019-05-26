@@ -15,7 +15,7 @@ class PDF(FileTypeBase):
         self.xmp_metadata = self.pdf_reader.getXmpMetadata()
 
     def get_text(self):
-        #  -> List[str]
+        # type: () -> [str]
         pages = []
 
         # printing number of pages in pdf file

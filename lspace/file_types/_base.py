@@ -12,6 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 class FileTypeBase:
+    extension = None
+    
     def __init__(self, path):
         self.path = path
 
