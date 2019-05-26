@@ -28,9 +28,9 @@ def read_config(config_path):
     else:
         conf = {}
     
-    default_config = get_default_config()
-    conf = default_config.update(conf)
-    return conf
+    config = get_default_config()
+    config.update(conf)
+    return config
 
 
 def get_metadata_for_isbn(isbn, service='openl') -> dict:
