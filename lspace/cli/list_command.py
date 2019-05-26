@@ -16,23 +16,20 @@ def _list(query, path, details):
 
     if path:
         for result in results:
-            click.echo(f'{os.path.join(current_app.config["LIBRARY_PATH"], result.path)}')
-        return
+            click.echo(
+                '{library_path}, result.path)}'.format(library_path=os.path.join(current_app.config["LIBRARY_PATH"]),
+                                                       result=result))
+            return
 
-    if details:
+        if details:
+            for result in results:
+                click.echo('{result.authors_names} - {result.title}'.format(result=result))
+                click.echo('{result.full_path}'.format(result=result))
+                click.echo('language: {result.language}'.format(result=result))
+                click.echo('year: {result.year}'.format(result=result))
+                click.echo('isbn: {result.isbn13}'.format(result=result))
+                click.echo()
+            return
+
         for result in results:
-            authors_str = ', '.join([author.name for author in result.authors])
-            click.echo(f'{authors_str} - {result.title}')
-            click.echo(f'{result.full_path}')
-            click.echo(f'language: {result.language}')
-            click.echo(f'year: {result.year}')
-            click.echo(f'isbn: {result.isbn13}')
-            click.echo()
-        return
-
-
-    for result in results:
-        authors_str = ', '.join([author.name for author in result.authors])
-        click.echo(f'{authors_str} - {result.title}')
-
-
+            click.echo('{result.authors_names} - {result.title}'.format(result=result))

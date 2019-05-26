@@ -43,8 +43,8 @@ def import_wizard(path, skip_library_check, move):
         try:
             f = FileClass(path)
         except Exception as e:
-            logger.exception(f'error reading {path}', exc_info=True)
-            click.secho(f'error reading {path}', fg='red')
+            logger.exception('error reading {path}'.format(path=path), exc_info=True)
+            click.secho('error reading {path}'.format(path=path), fg='red')
             return
 
         if not skip_library_check and Book.query.filter_by(md5sum=f.get_md5()).first():
@@ -127,7 +127,10 @@ def format_metadata_choices(isbns_with_metadata) -> dict:
         authors = ', '.join([author for author in meta.pop('Authors', [])])
         title = meta.pop('Title')
         formatted_metadata[str(idx + 1)] = \
-            click.style(f'\n{idx + 1}: {authors} - {title}\n', bold=True) + yaml.dump(meta, allow_unicode=True)
+            click.style('\n{idx}: {authors} - {title}\n'.format(
+                authors=authors, title=title,
+                idx=idx + 1), bold=True) + yaml.dump(meta,
+                                                     allow_unicode=True)
 
         # otherwise its one of the other options, like search etc
     for key, val in other_choices.items():
@@ -148,9 +151,9 @@ def _import(file_type_object, choice, move_file):
     if similar_books:
         click.echo(bold('found similar books in library:'))
         for book in similar_books:
-            click.echo(bold(f'{book.authors_names} - {book.title}'))
-            click.echo(f'isbn: {book.isbn13}')
-            click.echo(f'{book.path}\n')
+            click.echo(bold('{book.authors_names} - {book.title}'.format(book=book)))
+            click.echo('isbn: {book.isbn13}'.format(book=book))
+            click.echo('{book.path}\n'.format(book=book))
         if not click.confirm('import anyway?'):
             click.echo(bold('skipping %s' % file_type_object.path))
             return

@@ -13,11 +13,10 @@ def reimport(query):
         exit()
     results = query_db(query)
     
-    for result in results:        
-        authors_str = ', '.join([author.name for author in result.authors])
+    for result in results:
         click.echo('\n')
-        click.echo(f'{authors_str} - {result.title}')
-        click.echo(f'{result.full_path}')
+        click.echo('{result.authors_names} - {result.title}'.format(result=result))
+        click.echo('{result.full_path}'.format(result=result))
         if click.confirm('reimport this?'):
             # delete without commit to exclude this book from db check
             db.session.delete(result)

@@ -42,7 +42,7 @@ def export(query, export_path, format):
         authors_slug = '_'.join(author_slugs)
 
         authors_str = '_'.join([author.name for author in result.authors])
-        title_slug=slugify(result.title)
+        title_slug = slugify(result.title)
 
         if format and format != result.extension:
             target_extension = format
@@ -68,6 +68,8 @@ def export(query, export_path, format):
             except Exception as e:
                 logger.exception('error converting %s' % result.full_path, exc_info=True)
         else:
-            click.echo(f'exporting {authors_str} - {result.title} to {target_path}')
+            click.echo('exporting {authors_str} - {result.title} to {target_path}'.format(authors_str=authors_str,
+                                                                                          result=result,
+                                                                                          target_path=target_path))
             shutil.copyfile(result.full_path, target_path)
     return

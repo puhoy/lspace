@@ -14,10 +14,9 @@ def remove(query):
     results = query_db(query)
     
     for result in results:        
-        authors_str = ', '.join([author.name for author in result.authors])
         click.echo('\n')
-        click.echo(f'{authors_str} - {result.title}')
-        click.echo(f'{result.full_path}')
+        click.echo('{result.authors_name} - {result.title}'.format(result=result))
+        click.echo('{result.full_path}'.format(result=result))
         if click.confirm('delete this book from library?'):
             os.unlink(result.full_path)
             db.session.delete(result)

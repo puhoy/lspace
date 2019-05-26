@@ -112,7 +112,9 @@ def find_unused_path(base_path, book_path_format, authors: str, title: str, exte
         if count == 0:
             path_from_base_path += extension
         else:
-            path_from_base_path = f'{path_from_base_path}_{count}{extension}'
+            path_from_base_path = '{path_from_base_path}_{count}{extension}'.format(
+                path_from_base_path=path_from_base_path,
+                count=count, extension=extension)
 
         target_path = os.path.join(base_path, path_from_base_path)
 

@@ -48,8 +48,8 @@ def manual_import(file_type_object: FileTypeBase, *args, **kwargs):
     edit_dict = deepcopy(_edit_dict)
 
     while True:
-        text = f'# import {file_type_object.path}\n'
-        text += f'# only the title is needed, but you probably want to specify more :)\n\n'
+        text = '# import {file_type_object.path}\n'.format(file_type_object=file_type_object)
+        text += '# only the title is needed, but you probably want to specify more :)\n\n'
         text += yaml.dump(edit_dict, sort_keys=False)
 
         result = click.edit(text, require_save=True)
