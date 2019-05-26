@@ -44,7 +44,8 @@ matrix:
 
 install: "pip install -e .[test]"
 
-script: pytest
+# https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems
+script: python3 -m pytest || python -m pytest
 
 # Push the results back to codecov
 after_success:
