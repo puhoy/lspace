@@ -89,7 +89,8 @@ class FileTypeBase:
             'searching isbn from filename': self.find_isbn_from_filename
         }
 
-    def _filter_symbols(self, s: str):
+    def _filter_symbols(self, s):
+        # type: (str) -> str
         whitelist = string.ascii_letters + string.digits + ' '
         clean_string = ''.join(
             c if c in whitelist else ' ' for c in s)
