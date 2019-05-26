@@ -2,9 +2,11 @@
 .vscode
 __pycache__
 env
+env_*
 *.egg-info
 build
 dist
 .doit.db
 .coverage
 htmlcov
+*.pyc

@@ -14,7 +14,8 @@ def init():
     app_dir = current_app.config['APP_DIR']
     config_path = current_app.config['CONFIG_PATH']
 
-    os.makedirs(app_dir, exist_ok=True)
+    if not os.path.isdir(app_dir):
+        os.makedirs(app_dir)
 
     if os.path.exists(config_path):
         if not click.confirm('config exists - override?'):

@@ -53,7 +53,8 @@ def export(query, export_path, format):
                                                  title_slug,
                                                  target_extension)
         target_path = os.path.join(export_path, target_in_export_path)
-        os.makedirs(os.path.dirname(target_path), exist_ok=True)
+        if not os.path.isdir(os.path.dirname(target_path)):
+            os.makedirs(os.path.dirname(target_path))
 
         if target_extension != result.extension:
             click.echo('converting %s to %s' % (result.extension, format))

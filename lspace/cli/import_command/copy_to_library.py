@@ -42,7 +42,9 @@ def _copy_to_library(file_type_object, result, move_file):
                      file_type_object.path)
         return False
 
-    os.makedirs(os.path.dirname(target_path), exist_ok=True)
+    if not os.path.isdir(os.path.dirname(target_path)):
+        os.makedirs(os.path.dirname(target_path))
+
     logger.debug('importing to %s' % target_path)
     if not move_file:
         copyfile(file_type_object.path, target_path)
