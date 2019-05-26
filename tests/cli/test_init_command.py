@@ -16,7 +16,7 @@ def get_temp_dir():
 
 class TestInitCommand(unittest.TestCase):
 
-    def setUp(self) -> None:
+    def setUp(self):
         self.test_dir = get_temp_dir()
         self.app = get_test_app(self.test_dir)
 
