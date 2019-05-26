@@ -40,7 +40,7 @@ matrix:
 
     - name: "osx 2.7"
       os: osx
-      osx_image: xcode10.2  # Python 3.7.2 running on macOS 10.14.3
+      osx_image: xcode8.3  # Python 3.7.2 running on macOS 10.14.3
       language: shell       # 'language: python' is an error on Travis CI macOS
       python: "2.7"
 
