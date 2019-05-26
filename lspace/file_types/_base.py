@@ -68,7 +68,7 @@ class FileTypeBase:
         if self.get_title():
             search_str = self._filter_symbols(self.get_title())
             if self.get_author():
-                search_str = f'{self._filter_symbols(self.get_author())} {search_str}'
+                search_str = '%s %s' % (self._filter_symbols(self.get_author()), search_str)
             results = query_google_books(search_str)
             if results:
                 logger.info('found isbns from author + title...')
