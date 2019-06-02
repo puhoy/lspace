@@ -1,10 +1,11 @@
 import os
 
+from flask import current_app
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from .. import db, whooshee
-from flask import current_app
+
 
 @whooshee.register_model('title', 'language', 'isbn13')
 class Book(db.Model):

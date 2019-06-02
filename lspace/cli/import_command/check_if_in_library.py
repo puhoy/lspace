@@ -4,7 +4,7 @@ from lspace import db
 from lspace.models import Author, Book
 
 logger = logging.getLogger(__name__)
-
+from whoosh.qparser import AndGroup
 
 def check_if_in_library(result):
     """
@@ -21,7 +21,7 @@ def check_if_in_library(result):
     year = result.get('Year', '')
     language = result.get('Language', '')
 
-    books = Book.query.whooshee_search(title, match_substrings=False).all()
+    books = Book.query.whooshee_search(title, match_substrings=False, group=AndGroup).all()
     if isbn13:
         books += db.session.query(Book).filter_by(isbn13=isbn13).distinct()
 

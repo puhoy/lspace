@@ -1,5 +1,3 @@
-import json
-
 import isbnlib
 
 from lspace import db
@@ -11,7 +9,7 @@ def _get_metadata_for_isbn(isbn, service='openl'):
     # type: (str, str) -> dict
     cached_meta = MetaCache.query.filter_by(isbn=isbn, service=service).first()
     if cached_meta:
-        return json.loads(cached_meta.data)
+        return cached_meta.results
     else:
         try:
             meta = isbnlib.meta(isbn, service=service, cache='default')
@@ -20,7 +18,7 @@ def _get_metadata_for_isbn(isbn, service='openl'):
                 isbnlib.dev._exceptions.DataNotFoundAtServiceError
                 ):
             meta = {}
-        new_meta = MetaCache(isbn=isbn, service=service, data=json.dumps(meta))
+        new_meta = MetaCache(isbn=isbn, service=service, results=meta)
 
         db.session.add(new_meta)
         db.session.commit()
@@ -52,4 +50,21 @@ def query_google_books(words):
 
     except isbnlib.dev._exceptions.NoDataForSelectorError as e:
         results = []
+    return results
+
+
+def query_db(query, books=True, authors=True):
+    from ..models import Book, Author
+    if not query or (len(query) == 1 and not query[0]):  # in case of ('', )
+        return Book.query.all()
+    else:
+        results = []
+        joined_query = ' '.join(query)
+        if books:
+            results = Book.query.whooshee_search(joined_query, match_substrings=False).all()
+        if authors:
+            author_results = Author.query.whooshee_search(joined_query, match_substrings=False).all()
+            for author in author_results:
+                for book in author.books:
+                    results.append(book)
     return results

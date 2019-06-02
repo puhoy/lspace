@@ -8,7 +8,8 @@ from slugify import slugify
 
 from flask import current_app
 from lspace.cli import cli
-from lspace.helpers import query_db, find_unused_path
+from lspace.helpers import find_unused_path
+from lspace.helpers.query import query_db
 
 logger = logging.getLogger(__name__)
 

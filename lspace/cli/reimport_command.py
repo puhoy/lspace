@@ -3,7 +3,7 @@ import click
 from lspace.cli.import_command import import_wizard
 from lspace.cli import cli
 from lspace import db
-from lspace.helpers import query_db
+from lspace.helpers.query import query_db
 
 
 @cli.command(help='reimport books in library')

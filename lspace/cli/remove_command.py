@@ -2,7 +2,7 @@ import os
 import click
 
 from lspace.cli import cli
-from lspace.helpers import query_db
+from lspace.helpers.query import query_db
 from lspace import db
 
 

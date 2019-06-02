@@ -4,8 +4,8 @@ import click
 import yaml
 
 from lspace.file_types import FileTypeBase
-from lspace.helpers import query_google_books, preprocess_isbns
-from lspace.helpers import query_isbn_data
+from lspace.helpers import preprocess_isbns
+from lspace.helpers.query import query_isbn_data, query_google_books
 
 
 def try_next_results(search_generator, *args, **kwargs):

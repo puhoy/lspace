@@ -3,7 +3,7 @@ import os
 import click
 
 from lspace.cli import cli
-from lspace.helpers import query_db
+from lspace.helpers.query import query_db
 from flask import current_app
 
 
@@ -31,5 +31,5 @@ def _list(query, path, details):
                 click.echo()
             return
 
-        for result in results:
-            click.echo('{result.authors_names} - {result.title}'.format(result=result))
+    for result in results:
+        click.echo('{result.authors_names} - {result.title}'.format(result=result))
