@@ -34,7 +34,7 @@ def create_app(config_path=None, app_dir=None):
         config_path = os.path.join(app.config['APP_DIR'], 'config.yaml')
 
     app.config['CONFIG_PATH'] = config_path
-    app.config['USER_CONFIG'] = read_config(config_path)
+    app.config['USER_CONFIG'] = read_config(config_path, app_dir)
     app.config['SQLALCHEMY_DATABASE_URI'] = app.config['USER_CONFIG']['database_path']
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['WHOOSHEE_DIR'] = os.path.join(app.config['APP_DIR'], 'whoosh_index')

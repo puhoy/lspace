@@ -10,17 +10,17 @@ from lspace import APP_NAME
 logger = logging.getLogger(__name__)
 
 
-def get_default_config():
+def get_default_config(app_dir):
     this_dir = os.path.dirname(os.path.abspath(__file__))
     path_from_here = '../config/'
     with open(os.path.join(this_dir, path_from_here, 'default_conf.yaml'), 'r') as default_config_file:
         default_config = yaml.load(default_config_file, Loader=yaml.SafeLoader)
         default_config['database_path'] = default_config['database_path'].format(
-            APP_DIR=click.get_app_dir(APP_NAME))
+            APP_DIR=app_dir)
     return default_config
 
 
-def read_config(config_path):
+def read_config(config_path, app_dir):
     if os.path.isfile(config_path):
         with open(config_path, 'r') as config:
             conf = yaml.load(config, Loader=yaml.SafeLoader)
@@ -28,7 +28,7 @@ def read_config(config_path):
     else:
         conf = {}
     
-    config = get_default_config()
+    config = get_default_config(app_dir)
     config.update(conf)
     return config
 

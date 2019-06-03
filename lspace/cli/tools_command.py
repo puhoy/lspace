@@ -40,3 +40,14 @@ def clear_cache():
     num = MetaCache.query.delete()
     db.session.commit()
     click.echo('deleted %s rows' % num)
+
+@tools.command(help='start ipython')
+def shell():
+    import rlcompleter
+    import pdb
+    import rlcompleter, readline
+    readline.parse_and_bind('tab: complete')
+
+    pdb.Pdb.complete = rlcompleter.Completer(locals()).complete
+
+    breakpoint()

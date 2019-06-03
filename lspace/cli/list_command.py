@@ -17,19 +17,18 @@ def _list(query, path, details):
     if path:
         for result in results:
             click.echo(
-                '{library_path}, result.path)}'.format(library_path=os.path.join(current_app.config["LIBRARY_PATH"]),
-                                                       result=result))
+                result.full_path)
             return
 
-        if details:
-            for result in results:
-                click.echo('{result.authors_names} - {result.title}'.format(result=result))
-                click.echo('{result.full_path}'.format(result=result))
-                click.echo('language: {result.language}'.format(result=result))
-                click.echo('year: {result.year}'.format(result=result))
-                click.echo('isbn: {result.isbn13}'.format(result=result))
-                click.echo()
-            return
+    if details:
+        for result in results:
+            click.echo('{result.authors_names} - {result.title}'.format(result=result))
+            click.echo('{result.full_path}'.format(result=result))
+            click.echo('language: {result.language}'.format(result=result))
+            click.echo('year: {result.year}'.format(result=result))
+            click.echo('isbn: {result.isbn13}'.format(result=result))
+            click.echo()
+        return
 
     for result in results:
         click.echo('{result.authors_names} - {result.title}'.format(result=result))

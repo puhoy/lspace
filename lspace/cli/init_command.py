@@ -21,7 +21,7 @@ def init():
         if not click.confirm('config exists - override?'):
             return
 
-    default_config = get_default_config()
+    default_config = get_default_config(app_dir=app_dir)
     with open(config_path, 'w') as config:
         yaml.dump(default_config, config)
     click.echo('written config file to %s' % config_path)
