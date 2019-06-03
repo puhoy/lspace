@@ -1,17 +1,14 @@
+import os
 import shutil
 import tempfile
 import unittest
-import os
 
-from _pytest.capture import capsys
 from flask_migrate import upgrade
 
-from unittest.mock import MagicMock
-
 from lspace import create_app
-
-from lspace.cli import list_command, remove_command
+from lspace.cli import remove_command
 from lspace.models import Book, Author
+
 
 def get_test_app(test_dir):
     return create_app(app_dir=test_dir)
