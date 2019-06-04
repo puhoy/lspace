@@ -19,7 +19,7 @@ class PDF(FileTypeBase):
         pages = []
 
         # printing number of pages in pdf file
-        for page_idx in range(self.pdf_reader.numPages):
+        for page_idx in range(min(self.pdf_reader.numPages, 30)):
             page = self.pdf_reader.getPage(page_idx)
             try:
                 extracted_text = page.extractText()
