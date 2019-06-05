@@ -6,10 +6,7 @@ import yaml
 from lspace.file_types import FileTypeBase
 from lspace.helpers import preprocess_isbns
 from lspace.helpers.query import query_isbn_data, query_google_books
-
-
-def try_next_results(search_generator, *args, **kwargs):
-    return next(search_generator)
+from lspace.helpers.search_result import SearchResult
 
 
 def peek_function(file_type_object, old_choices, *args, **kwargs):
@@ -81,7 +78,7 @@ def manual_import(file_type_object, *args, **kwargs):
                         isbn = isbns[0]
                         result['ISBN-13'] = isbn
 
-                return [result]
+                return [SearchResult(result)]
 
 
 other_choices = {
@@ -94,9 +91,6 @@ other_choices = {
     'p': dict(
         function=peek_function,
         explanation='peek in the text'),
-    't': dict(
-        function=try_next_results,
-        explanation='try to get more results'),
     'm': dict(
         function=manual_import,
         explanation='import manually'),

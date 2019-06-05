@@ -7,13 +7,14 @@ import isbnlib
 
 from lspace.helpers import preprocess_isbns
 from lspace.helpers.query import query_isbn_data, query_google_books
+from flask import copy_current_request_context
 
 logger = logging.getLogger(__name__)
 
 
 class FileTypeBase:
     extension = None
-    
+
     def __init__(self, path):
         self.path = path
 
@@ -51,6 +52,7 @@ class FileTypeBase:
             d = query_isbn_data(_isbn)
             if d:
                 return [d]
+        return []
 
     def find_isbn_in_text(self):
         logger.info('looking for isbn in text...')
@@ -65,6 +67,7 @@ class FileTypeBase:
             if isbns_with_metadata:
                 logger.info('found isbns in text!')
                 return isbns_with_metadata
+        return []
 
     def find_isbn_from_author_title(self):
         if self.get_title():
@@ -75,19 +78,26 @@ class FileTypeBase:
             if results:
                 logger.info('found isbns from author + title...')
                 return results
+        return []
 
     def find_isbn_from_filename(self):
         guessed_meta = self.guess_from_filename()
         if guessed_meta:
             return guessed_meta
+        return []
 
-    def get_find_functions(self):
-        return {
-            'searching isbn in metadata': self.find_isbn_in_metadata,
-            'searching isbn in text': self.find_isbn_in_text,
-            'searching isbn from author and title': self.find_isbn_from_author_title,
-            'searching isbn from filename': self.find_isbn_from_filename
-        }
+    def fetch_results(self):
+        find_functions = [self.find_isbn_in_metadata,
+                          self.find_isbn_in_text,
+                          self.find_isbn_from_author_title,
+                          self.find_isbn_from_filename]
+        results = {}
+        for f in find_functions:
+            for result in f():
+                results[result.isbn] = result
+        self.results = list(results.values())
+        return self.results
+
 
     def _filter_symbols(self, s):
         # type: (str) -> str
@@ -108,8 +118,6 @@ class FileTypeBase:
         results = query_google_books(clean_filename)
         logger.debug('results: %s' % results)
         return results
-
-
 
     def get_isbns_from_text(self):
         pages = self.get_text()

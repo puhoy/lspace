@@ -9,6 +9,7 @@ from lspace.cli.import_command.check_if_in_library import check_if_in_library
 from lspace.cli.import_command.copy_to_library import _copy_to_library
 
 from lspace.file_types import get_file_type_class
+from lspace.helpers.search_result import SearchResult
 from lspace.models import Book
 
 from lspace.cli.import_command.options import other_choices
@@ -18,23 +19,6 @@ logger = logging.getLogger(__name__)
 
 def bold(s):
     return click.style(s, bold=True)
-
-
-def search_method_generator(methods):
-    while True:
-        got_something = False
-        for description, find_function in methods.items():
-            click.echo(bold(description))
-            res = find_function()
-            if res:
-                got_something = True
-                yield res
-            else:
-                click.echo('no results :(')
-
-        if not got_something:
-            yield []
-
 
 def import_wizard(path, skip_library_check, move):
     click.echo(bold('importing ') + path)
@@ -51,9 +35,7 @@ def import_wizard(path, skip_library_check, move):
             click.echo(bold('already imported') + ', skipping...')
             return
 
-        search_generator = search_method_generator(f.get_find_functions())
-
-        isbns_with_metadata = next(search_generator)
+        isbns_with_metadata = f.fetch_results()
 
         if len(isbns_with_metadata) == 0:
             click.echo('could not find any isbn or metadata for %s' % f.filename)
@@ -71,7 +53,7 @@ def import_wizard(path, skip_library_check, move):
             function_that_gets_new_choices = other_choices.get(choice)['function']
             isbns_with_metadata = function_that_gets_new_choices(file_type_object=f,
                                                                  old_choices=isbns_with_metadata,
-                                                                 search_generator=search_generator)
+                                                                 )
 
             if isbns_with_metadata is not False:
                 choice = choose_result(f, isbns_with_metadata)
@@ -116,8 +98,7 @@ def choose_result(file_type_object, isbns_with_metadata):
 
 
 def format_metadata_choices(isbns_with_metadata):
-    # type: (dict) -> dict
-    isbns_with_metadata = copy.deepcopy(isbns_with_metadata)
+    # type: (SearchResult) -> dict
 
     formatted_metadata = {
         # 'choice': 'str shown to user'
@@ -125,15 +106,11 @@ def format_metadata_choices(isbns_with_metadata):
     for idx, meta in enumerate(isbns_with_metadata):
         logger.info('adding %s' % meta)
 
-        authors = ', '.join([author for author in meta.pop('Authors', [])])
-        title = meta.pop('Title')
-        formatted_metadata[str(idx + 1)] = \
-            click.style('\n{idx}: {authors} - {title}\n'.format(
-                authors=authors, title=title,
-                idx=idx + 1), bold=True) + yaml.dump(meta,
-                                                     allow_unicode=True)
+        formatted_metadata[str(idx + 1)] = click.style(
+            '{index}: {head}\n'.format(index=idx + 1, head=meta.formatted_output_head()),
+                                         bold=True)
+        formatted_metadata[str(idx + 1)] += meta.formatted_output_details() + '\n'
 
-        # otherwise its one of the other options, like search etc
     for key, val in other_choices.items():
         formatted_metadata[key] = \
             click.style(yaml.dump({

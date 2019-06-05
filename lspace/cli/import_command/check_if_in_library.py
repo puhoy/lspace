@@ -1,12 +1,15 @@
 import logging
 
 from lspace import db
-from lspace.models import Author, Book
+from lspace.models import Book
 
 logger = logging.getLogger(__name__)
-from whoosh.qparser import AndGroup
+
+from lspace.helpers.search_result import SearchResult
+
 
 def check_if_in_library(result):
+    # type: (SearchResult) -> Set[Book]
     """
 
     :param file_type_object: wrapper for the file we want to import
@@ -15,14 +18,14 @@ def check_if_in_library(result):
     :return:
     """
 
-    title = result['Title']
-    isbn13 = result.get('ISBN-13', '')
-    publisher = result.get('Publisher', '')
-    year = result.get('Year', '')
-    language = result.get('Language', '')
+    title = result.title
+    isbn13 = result.isbn
+    publisher = result.publisher
+    year = result.year
+    language = result.language
 
-    books = Book.query.whooshee_search(title, match_substrings=False, group=AndGroup).all()
+
+    books = db.session.query(Book).filter_by(isbn13=isbn13).all()
     if isbn13:
-        books += db.session.query(Book).filter_by(isbn13=isbn13).distinct()
-
+        books += Book.query.filter(Book.title.ilike(title.replace(' ', '%')) ).distinct()
     return set(books)
