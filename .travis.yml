@@ -2,10 +2,6 @@ language: python
 
 matrix:
   include:
-    - name: "xenial 2.7"
-      python: "2.7"
-      dist: xenial
-
     - name: "xenial 3.4"
       python: "3.4"
       dist: xenial
@@ -21,10 +17,6 @@ matrix:
     - name: "xenial 3.7"
       python: "3.7"
       dist: xenial
-
-    - name: "trusty 2.7"
-      python: "2.7"
-      dist: trusty
 
     - name: "trusty 3.4"
       python: "3.4"
@@ -50,7 +42,7 @@ matrix:
       language: shell       # 'language: python' is an error on Travis CI macOS
       python: "3.6"
 
-install: pip install -e .[test]
+install: pip3 install -e .[test] || pip install -e .[test]
 
 # https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems
 script: python3 -m pytest || python -m pytest

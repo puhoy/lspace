@@ -13,7 +13,7 @@ the whole thing is pretty much just a weekend project, so i would be happy about
 
 ## requirements
 
-python 2.7 or >=3.4 and pip should be fine
+python >=3.4 and pip should be fine
 
 
 ## installation
