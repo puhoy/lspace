@@ -1,31 +1,8 @@
-import shutil
-import tempfile
-import unittest
-
-from flask_migrate import upgrade
-
-from lspace import create_app
 from lspace.cli.init_command import init
+from tests.cli._cli_test_base import BaseCliTest
 
 
-def get_test_app(test_dir):
-    return create_app(app_dir=test_dir)
-
-
-def get_temp_dir():
-    return tempfile.mkdtemp()
-
-
-class TestInitCommand(unittest.TestCase):
-
-    def setUp(self):
-        self.test_dir = get_temp_dir()
-        self.app = get_test_app(self.test_dir)
-        with self.app.app_context():
-            upgrade()
-
-    def tearDown(self):
-        shutil.rmtree(self.test_dir)
+class TestInitCommand(BaseCliTest):
 
     def test_init_command(self):
         runner = self.app.test_cli_runner()

@@ -10,8 +10,11 @@ mapping = {
 }
 
 
-def get_file_type_class(path):
+def get_file_type_object(path):
     filename, file_extension = os.path.splitext(path)
 
     file_class = mapping.get(file_extension, None)
-    return file_class
+    if file_class:
+        return file_class(path)
+    else:
+        return None

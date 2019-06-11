@@ -7,7 +7,7 @@ from lspace.cli.import_command.add_book_to_db import add_book_to_db
 from lspace.cli.import_command.check_if_in_library import check_if_in_library
 from lspace.cli.import_command.copy_to_library import _copy_to_library
 from lspace.cli.import_command.options import other_choices
-from lspace.file_types import get_file_type_class
+from lspace.file_types import get_file_type_object
 from lspace.models import Book
 
 logger = logging.getLogger(__name__)
@@ -17,53 +17,48 @@ def bold(s):
 
 def import_wizard(path, skip_library_check, move):
     click.echo(bold('importing ') + path)
-    FileClass = get_file_type_class(path)
-    if FileClass:
-        try:
-            f = FileClass(path)
-        except Exception as e:
-            logger.exception('error reading {path}'.format(path=path), exc_info=True)
-            click.secho('error reading {path}'.format(path=path), fg='red')
-            return
 
-        if not skip_library_check and Book.query.filter_by(md5sum=f.get_md5()).first():
-            click.echo(bold('already imported') + ', skipping...')
-            return
+    try:
+        f = get_file_type_object(path)
+    except Exception as e:
+        logger.exception('error reading {path}'.format(path=path), exc_info=True)
+        click.secho('error reading {path}'.format(path=path), fg='red')
+        return
 
-        isbns_with_metadata = f.fetch_results()
+    if not skip_library_check and Book.query.filter_by(md5sum=f.get_md5()).first():
+        click.echo(bold('already imported') + ', skipping...')
+        return
 
-        if len(isbns_with_metadata) == 0:
-            click.echo('could not find any isbn or metadata for %s' % f.filename)
-            choice = choose_result(f, [])
+    isbns_with_metadata = f.fetch_results()
 
-        else:
-            choice = choose_result(f, isbns_with_metadata)
-
-        logger.debug('choice was %s' % choice)
-
-        while choice in list(other_choices.keys()):
-            # if choice is one of "other choices", its not one of the results,
-            # but one of the strings mapped to functions
-
-            function_that_gets_new_choices = other_choices.get(choice)['function']
-            isbns_with_metadata = function_that_gets_new_choices(file_type_object=f,
-                                                                 old_choices=isbns_with_metadata,
-                                                                 )
-
-            if isbns_with_metadata is not False:
-                choice = choose_result(f, isbns_with_metadata)
-            else:
-                # "skip" is the only function that returns false here
-                choice = False
-
-        if choice:
-            return _import(f, choice, move)
-        else:
-            click.echo('skipping %s' % path, color='yellow')
+    if len(isbns_with_metadata) == 0:
+        click.echo('could not find any isbn or metadata for %s' % f.filename)
+        choice = choose_result(f, [])
 
     else:
-        # skip, because we have no class to read this file
-        click.echo('skipping %s' % path)
+        choice = choose_result(f, isbns_with_metadata)
+
+    logger.debug('choice was %s' % choice)
+
+    while choice in list(other_choices.keys()):
+        # if choice is one of "other choices", its not one of the results,
+        # but one of the strings mapped to functions
+
+        function_that_gets_new_choices = other_choices.get(choice)['function']
+        isbns_with_metadata = function_that_gets_new_choices(file_type_object=f,
+                                                             old_choices=isbns_with_metadata,
+                                                             )
+
+        if isbns_with_metadata is not False:
+            choice = choose_result(f, isbns_with_metadata)
+        else:
+            # "skip" is the only function that returns false here
+            choice = False
+
+    if choice:
+        return _import(f, choice, move)
+    else:
+        click.echo('skipping %s' % path, color='yellow')
 
 
 def choose_result(file_type_object, isbns_with_metadata):
