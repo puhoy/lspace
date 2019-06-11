@@ -94,7 +94,7 @@ class FileTypeBase:
         results = {}
         for f in find_functions:
             for result in f():
-                results[result.isbn] = result
+                results[result.isbn13] = result
         self.results = list(results.values())
         return self.results
 

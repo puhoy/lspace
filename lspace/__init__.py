@@ -5,6 +5,9 @@ import os
 APP_NAME = 'lspace'
 os.environ['FLASK_APP'] = os.path.join(os.path.dirname(__file__), 'app.py')
 
+from lspace.helpers.init_logging import init_logging
+init_logging('debug')
+#print(app.config['USER_CONFIG'].get('loglevel', 'info'))
 
 import click
 from flask import Flask
@@ -12,7 +15,6 @@ from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_whooshee import Whooshee
-from lspace.helpers.init_logging import init_logging
 
 
 db = SQLAlchemy()
@@ -41,7 +43,6 @@ def create_app(config_path=None, app_dir=None):
 
     app.config['LIBRARY_PATH'] = os.path.abspath(os.path.expanduser(app.config['USER_CONFIG']['library_path']))
 
-    init_logging(app.config['USER_CONFIG'].get('loglevel', 'info'))
     migration_dir = os.path.join(os.path.dirname(__file__), 'migrations')
 
     db.init_app(app)

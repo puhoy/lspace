@@ -2,13 +2,12 @@ import isbnlib
 
 from lspace import db
 from lspace.helpers import logger
-from lspace.helpers.search_result import SearchResult
 from lspace.models.meta_cache import MetaCache
 from lspace.models import Book, Author
 
 
 def _get_metadata_for_isbn(isbn, service='openl'):
-    # type: (str, str) -> SearchResult
+    # type: (str, str) -> Book
     cached_meta = MetaCache.query.filter_by(isbn=isbn, service=service).first()
     if cached_meta:
         meta = cached_meta.results
@@ -26,12 +25,12 @@ def _get_metadata_for_isbn(isbn, service='openl'):
         db.session.commit()
 
     if meta:
-        return SearchResult(meta, metadata_source=service)
+        return Book.from_search_result(meta, metadata_source=service)
     return None
 
 
 def query_isbn_data(isbn_str):
-    # type: (str) -> SearchResult
+    # type: (str) -> Book
 
     if isbnlib.is_isbn10(isbn_str):
         isbn_str = isbnlib.to_isbn13(isbn_str)
@@ -56,7 +55,7 @@ def query_google_books(words):
 
     except isbnlib.dev._exceptions.NoDataForSelectorError as e:
         raw_results = []
-    return [SearchResult(result, metadata_source='google books api') for result in raw_results]
+    return [Book.from_search_result(result, metadata_source='google books api') for result in raw_results]
 
 
 def query_db(query, books=True, authors=True):

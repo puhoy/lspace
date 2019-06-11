@@ -1,4 +1,3 @@
-import copy
 import logging
 
 import click
@@ -7,15 +6,11 @@ import yaml
 from lspace.cli.import_command.add_book_to_db import add_book_to_db
 from lspace.cli.import_command.check_if_in_library import check_if_in_library
 from lspace.cli.import_command.copy_to_library import _copy_to_library
-
+from lspace.cli.import_command.options import other_choices
 from lspace.file_types import get_file_type_class
-from lspace.helpers.search_result import SearchResult
 from lspace.models import Book
 
-from lspace.cli.import_command.options import other_choices
-
 logger = logging.getLogger(__name__)
-
 
 def bold(s):
     return click.style(s, bold=True)
@@ -98,7 +93,7 @@ def choose_result(file_type_object, isbns_with_metadata):
 
 
 def format_metadata_choices(isbns_with_metadata):
-    # type: (SearchResult) -> dict
+    # type: (Book) -> dict
 
     formatted_metadata = {
         # 'choice': 'str shown to user'

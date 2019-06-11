@@ -1,9 +1,8 @@
-import os
-from flask_migrate import upgrade
-
 
 from . import create_app
 
+import os
+from flask_migrate import upgrade
 
 def upgrade_db_if_needed(app):
     with app.app_context():

@@ -2,6 +2,7 @@ import logging
 import logging.config
 
 def init_logging(loglevel='info'):
+
     logging.config.dictConfig({
         'version': 1,
         'disable_existing_loggers': False,
@@ -22,6 +23,12 @@ def init_logging(loglevel='info'):
                 'handlers': ['default'],
                 'level': loglevel.upper(),
                 'propagate': True
+            },
+            'sqlalchemy.engine': {
+                'handlers': ['default'],
+                'level': loglevel.upper(),
+                'propagate': False
             }
         }
     })
+    logging.debug('{loglevel} logging!'.format(loglevel=loglevel))

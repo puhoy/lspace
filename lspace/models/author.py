@@ -14,3 +14,6 @@ class Author(db.Model):
     books = relationship("Book",
                          secondary="book_author_association",
                          back_populates="authors")
+
+    def __repr__(self):
+        return '<{name}>'.format(name=self.name)
