@@ -1,14 +1,9 @@
-import logging
-
 import click
 
+from lspace.cli import cli
 from lspace.cli.import_command._import import import_wizard
 from lspace.cli.import_command.add_book_to_db import add_book_to_db
 from lspace.cli.import_command.copy_to_library import _copy_to_library
-
-from .. import cli
-
-logger = logging.getLogger(__name__)
 
 
 @cli.command(name='import', help='import ebooks into your database')

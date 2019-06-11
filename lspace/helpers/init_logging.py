@@ -1,9 +1,8 @@
 import logging
-import logging.config
+from logging.config import dictConfig
 
 def init_logging(loglevel='info'):
-
-    logging.config.dictConfig({
+    dictConfig({
         'version': 1,
         'disable_existing_loggers': False,
         'formatters': {
@@ -24,11 +23,16 @@ def init_logging(loglevel='info'):
                 'level': loglevel.upper(),
                 'propagate': True
             },
-            'sqlalchemy.engine': {
+            'alembic': {
                 'handlers': ['default'],
-                'level': loglevel.upper(),
-                'propagate': False
+                'level': 'WARNING',
+                'propagate': True
             }
+
+            #'sqlalchemy.engine': {
+            #    'handlers': ['default'],
+            #    'level': loglevel.upper(),
+            #    'propagate': False
+            #}
         }
     })
-    logging.debug('{loglevel} logging!'.format(loglevel=loglevel))

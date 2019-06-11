@@ -12,8 +12,10 @@ from lspace.models import Book
 
 logger = logging.getLogger(__name__)
 
+
 def bold(s):
     return click.style(s, bold=True)
+
 
 def import_wizard(path, skip_library_check, move):
     click.echo(bold('importing ') + path)
@@ -103,7 +105,7 @@ def format_metadata_choices(isbns_with_metadata):
 
         formatted_metadata[str(idx + 1)] = click.style(
             '{index}: {head}\n'.format(index=idx + 1, head=meta.formatted_output_head()),
-                                         bold=True)
+            bold=True)
         formatted_metadata[str(idx + 1)] += meta.formatted_output_details() + '\n'
 
     for key, val in other_choices.items():

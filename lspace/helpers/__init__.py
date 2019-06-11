@@ -1,11 +1,8 @@
 import logging
 import os
 
-import click
 import isbnlib
 import yaml
-
-from lspace import APP_NAME
 
 logger = logging.getLogger(__name__)
 
