@@ -1,4 +1,4 @@
-import logging
+
 from logging.config import dictConfig
 
 def init_logging(loglevel='info'):

@@ -8,12 +8,13 @@ logger = logging.getLogger(__name__)
 
 
 def get_default_config(app_dir):
-    this_dir = os.path.dirname(os.path.abspath(__file__))
-    path_from_here = '../config/'
-    with open(os.path.join(this_dir, path_from_here, 'default_conf.yaml'), 'r') as default_config_file:
-        default_config = yaml.load(default_config_file, Loader=yaml.SafeLoader)
-        default_config['database_path'] = default_config['database_path'].format(
-            APP_DIR=app_dir)
+    default_config = {
+        'database_path': 'sqlite:///{APP_DIR}/lspace.db'.format(
+            APP_DIR=app_dir),
+        'library_path': '~ / library',
+        'file_format': '{AUTHORS}/{TITLE}',
+        'loglevel': 'error'
+    }
     return default_config
 
 
@@ -24,10 +25,11 @@ def read_config(config_path, app_dir):
 
     else:
         conf = {}
-    
+
     config = get_default_config(app_dir)
     config.update(conf)
     return config
+
 
 def find_unused_path(base_path, book_path_format, authors, title, extension):
     # type: (str, str, str, str, str) -> str
