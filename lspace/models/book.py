@@ -34,7 +34,8 @@ class Book(db.Model):
     @property
     def full_path(self):
         # type: () -> str
-        return os.path.join(current_app.config["LIBRARY_PATH"], self.path)
+        library_path = current_app.config['USER_CONFIG']['library_path']
+        return os.path.join(library_path, self.path)
 
     @property
     def authors_names(self):

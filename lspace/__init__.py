@@ -41,7 +41,7 @@ def create_app(config_path=None, app_dir=None):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['WHOOSHEE_DIR'] = os.path.join(app.config['APP_DIR'], 'whoosh_index')
 
-    app.config['LIBRARY_PATH'] = os.path.abspath(os.path.expanduser(app.config['USER_CONFIG']['library_path']))
+    app.config['USER_CONFIG']['library_path'] = os.path.abspath(os.path.expanduser(app.config['USER_CONFIG']['library_path']))
 
     migration_dir = os.path.join(os.path.dirname(__file__), 'migrations')
 

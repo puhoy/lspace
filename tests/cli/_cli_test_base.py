@@ -29,7 +29,7 @@ class BaseCliTest(unittest.TestCase):
 
         self.test_author_name = 'testname'
         self.test_title = 'testtitle'
-        self.test_path = '/some/path'
+        self.test_path = '/some/path.ext'
 
         self.test_author = Author(name=self.test_author_name)
         self.test_book = Book(authors=[self.test_author], title=self.test_title, path=self.test_path)
