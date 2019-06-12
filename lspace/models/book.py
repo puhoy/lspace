@@ -20,7 +20,7 @@ class Book(db.Model):
     title = Column(String(100))
     authors = relationship("Author",
                            secondary="book_author_association",
-                           backref="authors_books")
+                           backref="authors_books", )
     isbn13 = Column(String(13))
     publisher = Column(String(100))
     year = Column(Integer())
@@ -35,7 +35,7 @@ class Book(db.Model):
     def full_path(self):
         # type: () -> str
         library_path = current_app.config['USER_CONFIG']['library_path']
-        return os.path.join(library_path, self.path)
+        return os.path.expanduser(os.path.join(library_path, self.path))
 
     @property
     def authors_names(self):
@@ -69,8 +69,14 @@ class Book(db.Model):
         self.isbn13 = d.get('ISBN-13', None)
         self.title = d.get('Title', 'no title')
         self.publisher = d.get('Publisher', None)
-        self.year = int(d.get('Year', 'no year'))
         self.language = d.get('Language', None)
+
+        year = d.get('Year', None)
+        if not year:
+            self.year = 0
+        else:
+            self.year = int(year)
+
 
         if not d.get('Authors', None):
             authors = ['no author']
@@ -116,8 +122,6 @@ class Book(db.Model):
             source=self.metadata_source)
 
     def save(self):
-        print(self)
-        print('self id', self.id)
 
         db.session.add(self)
 

@@ -24,7 +24,7 @@ def check_if_in_library(result):
     language = result.language
 
 
-    books = db.session.query(Book).filter_by(isbn13=isbn13).all()
+    books = Book.query.filter_by(isbn13=isbn13).all()
     if isbn13:
         books += Book.query.filter(Book.title.ilike(title.replace(' ', '%')) ).distinct()
     return set(books)
