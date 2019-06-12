@@ -100,7 +100,7 @@ def format_metadata_choices(isbns_with_metadata):
     formatted_metadata = {
         # 'choice': 'str shown to user'
     }
-    for idx, meta in enumerate(isbns_with_metadata):
+    for idx, meta in reversed(list(enumerate(isbns_with_metadata))):
         logger.info('adding %s' % meta)
 
         formatted_metadata[str(idx + 1)] = click.style(

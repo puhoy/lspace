@@ -14,7 +14,8 @@ class Author(db.Model):
     books = relationship("Book",
                          secondary="book_author_association",
                          back_populates="authors",
-                         cascade_backrefs=False  # dont cascade to this authors books to prevent adding books from cache
+
+                         cascade=""
                          )
 
     def __repr__(self):

@@ -20,7 +20,11 @@ class Book(db.Model):
     title = Column(String(100))
     authors = relationship("Author",
                            secondary="book_author_association",
-                           backref="authors_books", )
+                           back_populates="books",
+
+
+                           )
+
     isbn13 = Column(String(13))
     publisher = Column(String(100))
     year = Column(Integer())
@@ -122,6 +126,8 @@ class Book(db.Model):
             source=self.metadata_source)
 
     def save(self):
+        for author in self.authors:
+            db.session.add(author)
 
         db.session.add(self)
 
