@@ -18,7 +18,7 @@ def _list(query, path, details):
         for result in results:
             click.echo(
                 result.full_path)
-            return
+        return
 
     if details:
         for result in results:
