@@ -48,7 +48,7 @@ setup(
     name='lspace',
     packages=find_packages(),
     include_package_data=True,
-    version='0.1.14',
+    version='0.1.15',
     entry_points='''
         [console_scripts]
         lspace=lspace.app:cli_group
