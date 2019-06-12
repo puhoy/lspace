@@ -25,14 +25,16 @@ class TestToolsUpdatePathsCommand(BaseCliTest):
             assert book.path == new_path
 
     def test_update_paths(self):
-        update_paths_module.update_path = MagicMock(return_value='asdasd')
+        with self.app.app_context():
+            update_paths_module.update_path = MagicMock(return_value='asdasd')
+            book = Book.query.first()
 
-        runner = self.app.test_cli_runner()
+            runner = self.app.test_cli_runner()
 
-        result = runner.invoke(update_paths_module._update_paths)
+            result = runner.invoke(update_paths_module._update_paths)
 
-        assert result.exit_code == 0
+            assert result.exit_code == 0
 
-        update_paths_module.update_path.assert_called()
+            update_paths_module.update_path.assert_called_with(book)
 
-        assert 'moved ' in result.output
+            assert 'moved ' in result.output
