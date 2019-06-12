@@ -2,6 +2,7 @@ import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 from flask_migrate import upgrade
 
@@ -29,7 +30,14 @@ class BaseCliTest(unittest.TestCase):
 
         self.test_author_name = 'testname'
         self.test_title = 'testtitle'
-        self.test_path = '/some/path.ext'
+        self.test_extenstion = '.txt'
+        self.test_path = os.path.join(self.app.config['USER_CONFIG']['library_path'],
+                                      self.test_author_name,
+                                      self.test_title + self.test_extenstion)
+        if not os.path.isdir(os.path.dirname(self.test_path)):
+            os.makedirs(os.path.dirname(self.test_path))
+
+        Path(self.test_path).touch()
 
         self.test_author = Author(name=self.test_author_name)
         self.test_book = Book(authors=[self.test_author], title=self.test_title, path=self.test_path)
