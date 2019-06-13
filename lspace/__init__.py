@@ -1,5 +1,6 @@
 __version__ = '0.1.15'
 
+import logging
 import os
 
 APP_NAME = 'lspace'
@@ -17,6 +18,8 @@ db = SQLAlchemy()
 migrate = Migrate()
 whooshee = Whooshee()
 marshmallow = Marshmallow()
+
+logger = logging.getLogger(__name__)
 
 
 def create_app(config_path=None, app_dir=None):

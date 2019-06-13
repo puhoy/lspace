@@ -6,23 +6,31 @@ from lspace.models.meta_cache import MetaCache
 from lspace.models import Book, Author
 
 
+def _fetch_isbn_meta(isbn, service):
+    try:
+        meta = isbnlib.meta(isbn, service=service, cache='default')
+    except (isbnlib.dev._exceptions.NoDataForSelectorError,
+            isbnlib._exceptions.NotValidISBNError,
+            isbnlib.dev._exceptions.DataNotFoundAtServiceError
+            ):
+        meta = {}
+    except Exception as e:
+        logger.exception('failed to get isbn data from {service}: {error}'.format(error=e, service=service))
+        meta = None
+    return meta
+
 def _get_metadata_for_isbn(isbn, service='openl'):
     # type: (str, str) -> Book
     cached_meta = MetaCache.query.filter_by(isbn=isbn, service=service).first()
     if cached_meta:
         meta = cached_meta.results
     else:
-        try:
-            meta = isbnlib.meta(isbn, service=service, cache='default')
-        except (isbnlib.dev._exceptions.NoDataForSelectorError,
-                isbnlib._exceptions.NotValidISBNError,
-                isbnlib.dev._exceptions.DataNotFoundAtServiceError
-                ):
-            meta = {}
-        new_meta = MetaCache(isbn=isbn, service=service, results=meta)
+        meta = _fetch_isbn_meta(isbn, service)
+        if meta != None:
+            new_meta = MetaCache(isbn=isbn, service=service, results=meta)
 
-        db.session.add(new_meta)
-        db.session.commit()
+            db.session.add(new_meta)
+            db.session.commit()
 
     if meta:
         return Book.from_search_result(meta, metadata_source=service)
@@ -54,6 +62,9 @@ def query_google_books(words):
         raw_results = isbnlib.goom(words)
 
     except isbnlib.dev._exceptions.NoDataForSelectorError as e:
+        raw_results = []
+    except Exception as e:
+        logger.exception('failed to get from google books: {error}'.format(error=e))
         raw_results = []
     return [Book.from_search_result(result, metadata_source='google books api') for result in raw_results]
 
