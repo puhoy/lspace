@@ -37,6 +37,13 @@ class Book(db.Model):
     shelve = relationship("Shelve", back_populates="books",  cascade="")
 
     @property
+    def shelve_name(self):
+        if self.shelve:
+            return self.shelve.name
+        else:
+            return current_app.config['USER_CONFIG']['default_shelve']
+
+    @property
     def full_path(self):
         # type: () -> str
         library_path = current_app.config['USER_CONFIG']['library_path']
@@ -45,12 +52,22 @@ class Book(db.Model):
     @property
     def authors_names(self):
         # type: () -> str
+        """
+        :return: concatenated author names
+        """
         return ', '.join(author.name for author in self.authors)
 
     @property
     def author_names_slug(self):
-        author_slugs = [slugify(author.name) for author in self.authors]
-        authors = '_'.join(author_slugs)
+        # type: () -> str
+        """
+        :return: slugified author names
+        """
+        if self.authors:
+            author_slugs = [slugify(author.name) for author in self.authors]
+            authors = '_'.join(author_slugs)
+        else:
+            authors = slugify(current_app.config['USER_CONFIG']['default_author'])
         return authors
 
     @property

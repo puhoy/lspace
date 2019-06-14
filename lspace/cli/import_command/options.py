@@ -7,7 +7,6 @@ from lspace.file_types import FileTypeBase
 from lspace.helpers import preprocess_isbns
 from lspace.helpers.query import query_isbn_data, query_google_books
 from lspace.models import Book, Shelve
-from lspace import db
 
 
 def peek_function(file_type_object, old_choices, *args, **kwargs):
@@ -99,6 +98,12 @@ def put_in_new_shelve(book, *args, **kwargs):
         return book
 
 
+def put_in_default_shelve(book, *args, **kwargs):
+    # type: (Book, list, dict) -> Book
+    book.shelve = None
+    return book
+
+
 other_choices = {
     'q': dict(
         function=run_search_function,
@@ -121,5 +126,9 @@ choose_shelve_other_choices = {
     'n': dict(
         function=put_in_new_shelve,
         explanation='add to new shelve'
+    ),
+    'd': dict(
+        function=put_in_default_shelve,
+        explanation='use default shelve'
     )
 }

@@ -174,7 +174,7 @@ def _import(file_type_object, book_choice, move_file):
             click.echo(bold('skipping %s' % file_type_object.path))
             return
 
-    if click.confirm('add this book to a shelve?'):
+    if click.confirm('add this book to a shelve?', default=True):
         shelve_or_other = choose_shelve()
         if shelve_or_other in choose_shelve_other_choices.keys():
             f = choose_shelve_other_choices.get(shelve_or_other)['function']

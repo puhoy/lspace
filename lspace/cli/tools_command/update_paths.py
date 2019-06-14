@@ -16,7 +16,7 @@ def update_path(book):
 
     file_type_object = get_file_type_object(source_path)
 
-    new_path = _copy_to_library(file_type_object, book, True)
+    new_path = _copy_to_library(file_type_object.path, book, True)
 
     book.path = new_path
     book.save()

@@ -21,10 +21,7 @@ class TestCopyToLibrary_Move(BaseCliTest):
 
             copy_to_library.find_unused_path = MagicMock(return_value=new_path)
 
-            file_type_object_mock = FileTypeBase(book.path)
-            file_type_object_mock.extension = '.test'
-
-            copy_to_library._copy_to_library(file_type_object_mock, book, move_file=True)
+            copy_to_library._copy_to_library(book.path, book, move_file=True)
             copy_to_library.move.assert_called_with(old_path, absolute_library_path)
             copy_to_library.copyfile.assert_not_called()
 
@@ -43,10 +40,7 @@ class TestCopyToLibrary_Copy(BaseCliTest):
 
             copy_to_library.find_unused_path = MagicMock(return_value=new_path)
 
-            file_type_object_mock = FileTypeBase(book.path)
-            file_type_object_mock.extension = '.test'
-
-            copy_to_library._copy_to_library(file_type_object_mock, book, move_file=False)
+            copy_to_library._copy_to_library(book.path, book, move_file=False)
             copy_to_library.move.assert_not_called()
 
             copy_to_library.copyfile.assert_called_with(old_path, absolute_library_path)
