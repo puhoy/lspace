@@ -1,17 +1,17 @@
 import logging
-from typing import Union
 
 import click
 import yaml
+from typing import Union
 
 from lspace.cli.import_command.add_book_to_db import add_book_to_db
+from lspace.cli.import_command.add_to_shelve import add_to_shelve
 from lspace.cli.import_command.check_if_in_library import check_if_in_library
 from lspace.cli.import_command.copy_to_library import _copy_to_library
-from lspace.cli.import_command.options import other_choices, choose_shelve_other_choices
+from lspace.cli.import_command.options import other_choices
 from lspace.file_types import FileTypeBase
 from lspace.file_types import get_file_type_object
-from lspace.models import Book, Shelve
-from lspace import db
+from lspace.models import Book
 
 logger = logging.getLogger(__name__)
 
@@ -72,40 +72,6 @@ def import_wizard(path, skip_library_check, move):
         click.echo('skipping %s' % path)
 
 
-def choose_shelve():
-    shelves = Shelve.query.all()
-    shelve_names = [shelve.name for shelve in shelves]
-
-    formatted_choices = {}
-    for idx, shelve_name in enumerate(shelve_names):
-        formatted_choices[str(idx + 1)] = click.style(
-            '{index}: {shelve_name}\n'.format(index=idx + 1, shelve_name=shelve_name),
-            bold=True)
-
-    for key, val in choose_shelve_other_choices.items():
-        formatted_choices[key] = \
-            click.style(yaml.dump({
-                key: val['explanation']},
-                allow_unicode=True), bold=True)
-
-    click.echo(''.join(formatted_choices.values()))
-    choices = formatted_choices.keys()
-
-    ret = click.prompt('choose a shelve!',
-                       type=click.Choice(choices))
-
-    if ret in list(choose_shelve_other_choices.keys()):
-        choice = ret
-    else:
-        try:
-            idx = int(ret) - 1
-            choice = shelve_names[idx]
-        except Exception as e:
-            logger.exception('cant convert %s to int!' % ret, exc_info=True)
-            return False
-
-    return choice
-
 
 def choose_result(file_type_object, isbns_with_metadata):
     # type: (FileTypeBase, [Book]) -> Book
@@ -157,12 +123,7 @@ def format_metadata_choices(isbns_with_metadata):
     logger.debug('formatted data is %s' % formatted_metadata)
     return formatted_metadata
 
-
-def _import(file_type_object, book_choice, move_file):
-    # type: (FileTypeBase, Book, bool) -> Union[Book, None]
-    logger.debug('importing %s, %s' % (file_type_object, book_choice))
-    logger.debug(file_type_object)
-
+def similar_books_decide_import(book_choice):
     similar_books = check_if_in_library(book_choice)
     if similar_books:
         click.echo(bold('found similar books in library:'))
@@ -170,18 +131,25 @@ def _import(file_type_object, book_choice, move_file):
             click.echo(bold('{book.authors_names} - {book.title}'.format(book=book)))
             click.echo('isbn: {book.isbn13}'.format(book=book))
             click.echo('{book.path}\n'.format(book=book))
+
         if not click.confirm('import anyway?'):
-            click.echo(bold('skipping %s' % file_type_object.path))
-            return
+            return False
+
+    return True
+
+
+def _import(file_type_object, book_choice, move_file):
+    # type: (FileTypeBase, Book, bool) -> Union[Book, None]
+    logger.debug('importing %s, %s' % (file_type_object, book_choice))
+    logger.debug(file_type_object)
+
+    do_import = similar_books_decide_import(book_choice)
+    if not do_import:
+        click.echo(bold('skipping {path}'.format(path=file_type_object.path)))
+        return
 
     if click.confirm('add this book to a shelve?', default=True):
-        shelve_or_other = choose_shelve()
-        if shelve_or_other in choose_shelve_other_choices.keys():
-            f = choose_shelve_other_choices.get(shelve_or_other)['function']
-            f(book=book_choice)
-        else:
-            shelve = Shelve.query.filter_by(name=shelve_or_other).first()
-            book_choice.shelve = shelve
+        add_to_shelve(book_choice)
 
     path_in_library = _copy_to_library(file_type_object.path, book_choice, move_file)
     if path_in_library:
