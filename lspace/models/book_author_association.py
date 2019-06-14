@@ -1,4 +1,3 @@
-
 from lspace import db
 
 book_author_association_table = db.Table('book_author_association',

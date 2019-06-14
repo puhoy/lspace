@@ -1,5 +1,3 @@
-
-
 from .author import Author
 from .book import Book
 from .shelve import Shelve

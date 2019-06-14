@@ -1,10 +1,7 @@
-import os
-
 import click
 
 from lspace.cli import cli
 from lspace.helpers.query import query_db
-from flask import current_app
 
 
 @cli.command(name='list', help='query your database')

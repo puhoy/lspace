@@ -34,7 +34,7 @@ class Book(db.Model):
     metadata_source = Column(String(20), default='')
 
     shelve_id = Column(Integer, ForeignKey('shelves.id'))
-    shelve = relationship("Shelve", back_populates="books",  cascade="")
+    shelve = relationship("Shelve", back_populates="books", cascade="")
 
     @property
     def shelve_name(self):
@@ -98,7 +98,6 @@ class Book(db.Model):
             self.year = 0
         else:
             self.year = int(year)
-
 
         if not d.get('Authors', None):
             authors = ['no author']

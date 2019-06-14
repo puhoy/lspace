@@ -1,10 +1,11 @@
 from copy import deepcopy
+from typing import Union
 
 import click
 import yaml
 
 from lspace.cli.import_command.base_helper import BaseHelper
-from lspace.cli.import_command.import_helpers.peek import Peek
+from lspace.cli.import_command.import_options.peek import Peek
 from lspace.file_types import FileTypeBase
 from lspace.helpers import preprocess_isbns
 from lspace.models import Book
@@ -22,13 +23,17 @@ def _prompt_choices(msg):
     choice = False
 
     while choice not in ['e', 'r']:
-        choice = click.prompt(msg + ' \n' +
-                              'e: edit\n' +
-                              'c: cancel editing\n' +
-                              'p: ' + Peek.explanation + '\n' +
-                              'r: restart with empty form\n',
-                              type=click.Choice(['e', 'r', 'p', 'c']), default='e')
+        choice = click.prompt(
+            click.style(
+                msg + ' \n' +
+                'e: edit\n' +
+                'r: restart with empty form\n' +
+                'c: cancel editing\n' +
+                'p: ' + Peek.explanation + '\n',
+                bold=True),
+            type=click.Choice(['e', 'r', 'p', 'c']), default='e')
         return choice
+
 
 def _get_edit_text(path):
     _edit_dict = dict(
@@ -48,6 +53,7 @@ def _get_edit_text(path):
 
 
 def get_edit_result(file_type_object):
+    # type: (FileTypeBase) -> Union[dict, bool]
     edit_text = _get_edit_text(file_type_object.path)
     choice = 'e'
 
@@ -60,11 +66,11 @@ def get_edit_result(file_type_object):
                 if book_dict['Title']:
                     return book_dict
                 else:
-                    choice = _prompt_choices(click.style('title is needed!', bold=True))
+                    choice = _prompt_choices('title is needed!')
                     edit_text = result
 
             else:
-                choice = _prompt_choices(click.style('no data! did you save?', bold=True))
+                choice = _prompt_choices('no data! did you save?')
 
         elif choice == 'r':
             edit_text = _get_edit_text(file_type_object.path)

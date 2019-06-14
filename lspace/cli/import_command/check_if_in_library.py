@@ -1,5 +1,7 @@
 import logging
 
+from typing import Set
+
 from lspace import db
 from lspace.models import Book
 
@@ -24,7 +26,9 @@ def check_if_in_library(result):
     language = result.language
 
 
-    books = Book.query.filter_by(isbn13=isbn13).all()
     if isbn13:
-        books += Book.query.filter(Book.title.ilike(title.replace(' ', '%')) ).distinct()
+        books = Book.query.filter_by(isbn13=isbn13).all()
+    else:
+        books = []
+    books += Book.query.filter(Book.title.ilike(title.replace(' ', '%')) ).distinct()
     return set(books)

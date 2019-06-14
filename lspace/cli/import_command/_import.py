@@ -8,7 +8,7 @@ from lspace.cli.import_command.add_book_to_db import add_book_to_db
 from lspace.cli.import_command.add_to_shelve import add_to_shelve
 from lspace.cli.import_command.check_if_in_library import check_if_in_library
 from lspace.cli.import_command.copy_to_library import _copy_to_library
-from lspace.cli.import_command.options import other_choices
+from lspace.cli.import_command.import_options._options import other_choices
 from lspace.file_types import FileTypeBase
 from lspace.file_types import get_file_type_object
 from lspace.models import Book
@@ -21,6 +21,7 @@ def bold(s):
 
 
 def import_wizard(path, skip_library_check, move):
+    # type: (str, bool, bool) -> Union[Book, None]
     click.echo(bold('importing ') + path)
 
     try:
@@ -72,7 +73,6 @@ def import_wizard(path, skip_library_check, move):
         click.echo('skipping %s' % path)
 
 
-
 def choose_result(file_type_object, isbns_with_metadata):
     # type: (FileTypeBase, [Book]) -> Book
     if not isbns_with_metadata:
@@ -85,8 +85,15 @@ def choose_result(file_type_object, isbns_with_metadata):
 
     choices = list(formatted_choices.keys())
 
-    ret = click.prompt('choose result for %s' % file_type_object.filename,
-                       type=click.Choice(choices))
+    if len(isbns_with_metadata) >= 1:
+        default = '1'
+    else:
+        default = 's'
+
+    ret = click.prompt('choose result for ' +
+                       click.style('{filename}'.format(filename=file_type_object.filename), bold=True),
+                       type=click.Choice(choices),
+                       default=default)
     if ret in list(other_choices.keys()):
         choice = ret
     else:
@@ -123,6 +130,7 @@ def format_metadata_choices(isbns_with_metadata):
     logger.debug('formatted data is %s' % formatted_metadata)
     return formatted_metadata
 
+
 def similar_books_decide_import(book_choice):
     similar_books = check_if_in_library(book_choice)
     if similar_books:
@@ -148,8 +156,8 @@ def _import(file_type_object, book_choice, move_file):
         click.echo(bold('skipping {path}'.format(path=file_type_object.path)))
         return
 
-    if click.confirm('add this book to a shelve?', default=True):
-        add_to_shelve(book_choice)
+
+    add_to_shelve(book_choice)
 
     path_in_library = _copy_to_library(file_type_object.path, book_choice, move_file)
     if path_in_library:

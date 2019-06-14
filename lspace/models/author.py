@@ -1,8 +1,8 @@
-
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from lspace import db, whooshee
+
 
 @whooshee.register_model('name')
 class Author(db.Model):

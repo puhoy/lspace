@@ -22,7 +22,7 @@ def reimport(query):
             db.session.delete(result)
             new_result = import_wizard(result.full_path, skip_library_check=True, move=True)
             if new_result:
-                db.session.commit()
+                new_result.save()
             else:
                 click.secho('no new entry - keeping the old one!')
                 db.session.rollback()

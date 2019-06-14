@@ -14,4 +14,4 @@ class Shelve(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(100))
 
-    books= relationship("Book", back_populates="shelve",  cascade="")
+    books = relationship("Book", back_populates="shelve", cascade="")
