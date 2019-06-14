@@ -3,6 +3,10 @@ import os
 
 import isbnlib
 import yaml
+import typing
+
+if typing.TYPE_CHECKING:
+    from lspace.models import Book
 
 logger = logging.getLogger(__name__)
 
@@ -31,24 +35,24 @@ def read_config(config_path, app_dir):
     return config
 
 
-def find_unused_path(base_path, book_path_format, authors, title, extension):
-    # type: (str, str, str, str, str) -> str
+def find_unused_path(base_path, book_path_format, source_path, book):
+    # type: (str, str, str, Book) -> str
     """
 
-    :param base_path: 
-    :param book_path_format: 
-    :param authors: 
-    :param title: 
-    :param extension: 
+    :param base_path: path to the library
+    :param book_path_format: template for path in library from user config
+    :param book:
     :return: new path relative from base_path  
     """
     # create the path for the book
 
     count = 0
 
+    _, extension = os.path.splitext(source_path)
+
     while count < 100:
         path_from_base_path = book_path_format.format(
-            AUTHORS=authors, TITLE=title)
+            AUTHORS=book.author_names_slug, TITLE=book.title, SHELVE=book.shelve, YEAR=book.year)
         # if, for some reason, the path starts with /, we need to make it relative
         while path_from_base_path.startswith(os.sep):
             logger.debug('trimming path to %s' % path_from_base_path[1:])

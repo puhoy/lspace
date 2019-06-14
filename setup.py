@@ -30,6 +30,7 @@ requirements = [
     "text-unidecode==1.2",
     "Werkzeug==0.15.4",
     "Whoosh==2.7.4",
+    "typing==3.6.6"
 ]
 
 test_requirements = [

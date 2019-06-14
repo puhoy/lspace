@@ -1,8 +1,8 @@
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Table
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
-from .. import db, whooshee
+from lspace import db, whooshee
 
 @whooshee.register_model('name')
 class Author(db.Model):
@@ -14,7 +14,6 @@ class Author(db.Model):
     books = relationship("Book",
                          secondary="book_author_association",
                          back_populates="authors",
-
                          cascade=""
                          )
 

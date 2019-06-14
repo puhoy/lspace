@@ -84,3 +84,4 @@ class BookTest(unittest.TestCase):
             author = Author.query.all()
             assert len(author) == 1
 
+    # todo: test cascading with shelve

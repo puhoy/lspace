@@ -12,9 +12,20 @@ from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_whooshee import Whooshee
+from sqlalchemy import MetaData
+
 from lspace.helpers.init_logging import init_logging
 
-db = SQLAlchemy()
+# fix migration for sqlite: https://github.com/miguelgrinberg/Flask-Migrate/issues/61#issuecomment-208131722
+naming_convention = {
+    "ix": 'ix_%(column_0_label)s',
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(column_0_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s"
+}
+db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
+
 migrate = Migrate()
 whooshee = Whooshee()
 marshmallow = Marshmallow()
@@ -48,7 +59,14 @@ def create_app(config_path=None, app_dir=None):
     migration_dir = os.path.join(os.path.dirname(__file__), 'migrations')
 
     db.init_app(app)
-    migrate.init_app(app, db, directory=migration_dir)
+
+    # fix migration for sqlite: https://github.com/miguelgrinberg/Flask-Migrate/issues/61#issuecomment-208131722
+    with app.app_context():
+        if db.engine.url.drivername == 'sqlite':
+            migrate.init_app(app, db, render_as_batch=True, directory=migration_dir)
+        else:
+            migrate.init_app(app, db, directory=migration_dir)
+
     whooshee.init_app(app)
     marshmallow.init_app(app)
 

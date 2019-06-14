@@ -3,7 +3,7 @@ import os
 
 from flask import current_app
 from slugify import slugify
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
 from lspace import db, whooshee
@@ -21,8 +21,6 @@ class Book(db.Model):
     authors = relationship("Author",
                            secondary="book_author_association",
                            back_populates="books",
-
-
                            )
 
     isbn13 = Column(String(13))
@@ -34,6 +32,9 @@ class Book(db.Model):
     path = Column(String(400))
 
     metadata_source = Column(String(20), default='')
+
+    shelve_id = Column(Integer, ForeignKey('shelves.id'))
+    shelve = relationship("Shelve", back_populates="books",  cascade="")
 
     @property
     def full_path(self):
@@ -128,6 +129,9 @@ class Book(db.Model):
     def save(self):
         for author in self.authors:
             db.session.add(author)
+
+        if self.shelve:
+            db.session.add(self.shelve)
 
         db.session.add(self)
 

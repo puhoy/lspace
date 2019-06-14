@@ -1,10 +1,10 @@
 import datetime
+import json
 
 from sqlalchemy import Column, String, DateTime, Text, Integer
 
 from lspace import db
 
-import json
 
 class MetaCache(db.Model):
     __tablename__ = 'meta_cache'

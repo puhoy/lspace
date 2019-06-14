@@ -6,7 +6,8 @@ import yaml
 from lspace.file_types import FileTypeBase
 from lspace.helpers import preprocess_isbns
 from lspace.helpers.query import query_isbn_data, query_google_books
-from lspace.models import Book
+from lspace.models import Book, Shelve
+from lspace import db
 
 
 def peek_function(file_type_object, old_choices, *args, **kwargs):
@@ -81,6 +82,23 @@ def manual_import(file_type_object, *args, **kwargs):
                 return [Book.from_search_result(result, metadata_source='manually added')]
 
 
+def put_in_new_shelve(book, *args, **kwargs):
+    # type: (Book, list, dict) -> Book
+    while True:
+        shelve_name = click.prompt(
+            'whats the name of the new shelve?')
+        existing_shelve = Shelve.query.filter_by(name=shelve_name).first()
+        if not existing_shelve:
+            shelve = Shelve(name=shelve_name)
+        else:
+            if click.confirm('shelve with this name already exists - put book in this shelve?'):
+                shelve = existing_shelve
+            else:
+                continue
+        book.shelve = shelve
+        return book
+
+
 other_choices = {
     'q': dict(
         function=run_search_function,
@@ -97,4 +115,11 @@ other_choices = {
     's': dict(
         function=skip_book_function,
         explanation='skip this book'),
+}
+
+choose_shelve_other_choices = {
+    'n': dict(
+        function=put_in_new_shelve,
+        explanation='add to new shelve'
+    )
 }
