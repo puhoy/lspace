@@ -44,6 +44,20 @@ class Book(db.Model):
             return current_app.config['USER_CONFIG']['default_shelve']
 
     @property
+    def shelve_name_slug(self):
+        return slugify(self.shelve_name)
+
+    @property
+    def language_slug(self):
+        language = self.language or current_app.config['USER_CONFIG']['default_language']
+        return slugify(language)
+
+    @property
+    def publisher_slug(self):
+        publisher = self.publisher or current_app.config['USER_CONFIG']['default_publisher']
+        return slugify(publisher)
+
+    @property
     def full_path(self):
         # type: () -> str
         library_path = current_app.config['USER_CONFIG']['library_path']

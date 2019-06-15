@@ -3,7 +3,7 @@ import logging
 
 import click
 
-from lspace.cli.import_command import _copy_to_library
+from lspace.cli.import_command import copy_to_library
 from lspace.cli.tools_command import tools
 from lspace.file_types import get_file_type_object
 from lspace.models import Book
@@ -16,7 +16,7 @@ def update_path(book):
 
     file_type_object = get_file_type_object(source_path)
 
-    new_path = _copy_to_library(file_type_object.path, book, True)
+    new_path = copy_to_library(file_type_object.path, book, True)
 
     book.path = new_path
     book.save()

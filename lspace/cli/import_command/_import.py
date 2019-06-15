@@ -7,7 +7,7 @@ from typing import Union
 from lspace.cli.import_command.add_book_to_db import add_book_to_db
 from lspace.cli.import_command.add_to_shelve import add_to_shelve
 from lspace.cli.import_command.check_if_in_library import check_if_in_library
-from lspace.cli.import_command.copy_to_library import _copy_to_library
+from lspace.cli.import_command.copy_to_library import copy_to_library
 from lspace.cli.import_command.import_options._options import other_choices
 from lspace.file_types import FileTypeBase
 from lspace.file_types import get_file_type_object
@@ -159,7 +159,7 @@ def _import(file_type_object, book_choice, move_file):
 
     add_to_shelve(book_choice)
 
-    path_in_library = _copy_to_library(file_type_object.path, book_choice, move_file)
+    path_in_library = copy_to_library(file_type_object.path, book_choice, move_file)
     if path_in_library:
         book = add_book_to_db(file_type_object, book_choice, path_in_library)
         click.secho('imported %s - %s' % (book.authors_names, book.title), fg='green')

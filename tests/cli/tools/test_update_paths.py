@@ -16,7 +16,7 @@ class TestToolsUpdatePathsCommand(BaseCliTest):
             test_new_path = 'new_path'
             file_type_object_mock = FileTypeBase(book.path)
 
-            update_paths_module._copy_to_library = MagicMock(return_value=test_new_path)
+            update_paths_module.copy_to_library = MagicMock(return_value=test_new_path)
             update_paths_module.get_file_type_object = MagicMock(return_value=file_type_object_mock)
 
             new_path = update_paths_module.update_path(book)

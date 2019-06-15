@@ -6,7 +6,7 @@ import yaml
 import typing
 
 if typing.TYPE_CHECKING:
-    from lspace.models import Book
+    pass
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,9 @@ def get_default_config(app_dir):
         'file_format': '{AUTHORS}/{TITLE}',
         'loglevel': 'error',
         'default_shelve': 'misc',
-        'default_author': 'no_author'
+        'default_author': 'no author',
+        'default_language': 'no language',
+        'default_publisher': 'no publisher'
     }
     return default_config
 
@@ -35,48 +37,6 @@ def read_config(config_path, app_dir):
     config = get_default_config(app_dir)
     config.update(conf)
     return config
-
-
-def find_unused_path(base_path, book_path_format, source_path, book):
-    # type: (str, str, str, Book) -> str
-    """
-
-    :param base_path: path to the library
-    :param book_path_format: template for path in library from user config
-    :param book:
-    :return: new path relative from base_path  
-    """
-    # create the path for the book
-
-    count = 0
-
-    _, extension = os.path.splitext(source_path)
-
-    while count < 100:
-        path_from_base_path = book_path_format.format(
-            AUTHORS=book.author_names_slug,
-            TITLE=book.title_slug,
-            SHELVE=book.shelve_name,
-            YEAR=book.year)
-        # if, for some reason, the path starts with /, we need to make it relative
-        while path_from_base_path.startswith(os.sep):
-            logger.debug('trimming path to %s' % path_from_base_path[1:])
-            path_from_base_path = path_from_base_path[1:]
-
-        if count == 0:
-            path_from_base_path += extension
-        else:
-            path_from_base_path = '{path_from_base_path}_{count}{extension}'.format(
-                path_from_base_path=path_from_base_path,
-                count=count, extension=extension)
-
-        target_path = os.path.join(base_path, path_from_base_path)
-
-        if not os.path.exists(target_path):
-            return path_from_base_path
-
-        count += 1
-    return False
 
 
 def preprocess_isbns(isbns):

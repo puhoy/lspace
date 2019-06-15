@@ -5,8 +5,6 @@ a cli ebook manager built around [isbnlib](https://github.com/xlcnd/isbnlib)
 currently supports epub and pdf
 
 
-the whole thing is pretty much just a weekend project, so i would be happy about reported issues or pull requests!
-
 [![Build Status](https://travis-ci.org/puhoy/lspace.svg?branch=master)](https://travis-ci.org/puhoy/lspace)
 
 [![codecov](https://codecov.io/gh/puhoy/lspace/branch/master/graph/badge.svg)](https://codecov.io/gh/puhoy/lspace)
@@ -28,6 +26,43 @@ after installation, you should run
 `lspace init`
 
 this will setup a new configuration file, which you can edit to specify the structure of your library, for example.
+
+a default config file would look like this:
+```
+database_path: sqlite:////home/USER/.config/lspace/lspace.db
+file_format: '{SHELVE}/{AUTHORS}_{TITLE}'
+library_path: ~/library
+loglevel: error
+default_shelve: misc
+default_author: no author
+default_language: no language
+default_publisher: no publisher
+```
+
+#### database path
+
+path to your database. 
+the project uses sqlalchemy, so all databases supported by sqlalchemy should be fine.
+
+#### file_format
+
+template string for storing the plain files in the library.
+
+`{SHELVE}/{AUTHORS}_{TITLE}` would produce files like `scifi/cixin-liu_three-body-problem.epub`
+
+author and title will be automatically slugified for this.
+
+possible variables to use are: AUTHORS, TITLE, SHELVE, YEAR, LANGUAGE, PUBLISHER
+
+#### library path
+
+where the imported files are stored
+
+#### loglevel
+
+#### default_{shelve, author, language, publisher}
+
+the default field names, in case nothing is specified in import
 
 
 ## usage
