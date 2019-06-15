@@ -8,7 +8,6 @@ os.environ['FLASK_APP'] = os.path.join(os.path.dirname(__file__), 'app.py')
 
 import click
 from flask import Flask
-from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_whooshee import Whooshee
@@ -28,8 +27,6 @@ db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 
 migrate = Migrate()
 whooshee = Whooshee()
-marshmallow = Marshmallow()
-
 logger = logging.getLogger(__name__)
 
 
@@ -68,6 +65,5 @@ def create_app(config_path=None, app_dir=None):
             migrate.init_app(app, db, directory=migration_dir)
 
     whooshee.init_app(app)
-    marshmallow.init_app(app)
 
     return app
