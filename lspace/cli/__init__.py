@@ -1,3 +1,5 @@
+import os
+
 from flask.cli import AppGroup
 
 cli = AppGroup('cli')
@@ -11,6 +13,6 @@ from .reimport_command import reimport
 from .export_command import export
 from .version_command import version
 
-
-#from .train import _train
-from .db_command import db
+print(os.environ.get('LSPACE_DEV', None))
+if os.environ.get('LSPACE_DEV', None) == '1':
+    from .db_command import db

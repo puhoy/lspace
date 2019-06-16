@@ -47,7 +47,7 @@ def copy_to_library(source_path, book, move_file):
     return path_in_library
 
 
-def find_unused_path(base_path, book_path_format, source_path, book):
+def find_unused_path(base_path, book_path_format, source_path, book, extension=None):
     # type: (str, str, str, Book) -> str
     """
 
@@ -59,8 +59,8 @@ def find_unused_path(base_path, book_path_format, source_path, book):
     # create the path for the book
 
     count = 0
-
-    _, extension = os.path.splitext(source_path)
+    if not extension:
+        _, extension = os.path.splitext(source_path)
 
     while count < 100:
         path_from_base_path = book_path_format.format(

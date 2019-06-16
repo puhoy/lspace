@@ -1,4 +1,5 @@
 import isbnlib
+from typing import List
 
 from lspace import db
 from lspace.helpers import logger
@@ -70,6 +71,7 @@ def query_google_books(words):
 
 
 def query_db(query, books=True, authors=True):
+    # type: (str, bool, bool) -> List[Book]
     if not query or (len(query) == 1 and not query[0]):  # in case of ('', )
         return Book.query.all()
     else:

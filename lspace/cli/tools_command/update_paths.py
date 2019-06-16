@@ -3,7 +3,7 @@ import logging
 
 import click
 
-from lspace.cli.import_command import copy_to_library
+from lspace.cli.import_command.copy_to_library import copy_to_library
 from lspace.cli.tools_command import tools
 from lspace.file_types import get_file_type_object
 from lspace.models import Book
