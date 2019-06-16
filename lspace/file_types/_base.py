@@ -7,7 +7,6 @@ import isbnlib
 
 from lspace.helpers import preprocess_isbns
 from lspace.helpers.query import query_isbn_data, query_google_books
-from flask import copy_current_request_context
 
 logger = logging.getLogger(__name__)
 
