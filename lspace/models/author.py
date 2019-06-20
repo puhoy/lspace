@@ -17,5 +17,8 @@ class Author(db.Model):
                          cascade=""
                          )
 
+    def from_dict(self, d):
+        self.name = d.get('name', None)
+
     def __repr__(self):
         return '<{name}>'.format(name=self.name)

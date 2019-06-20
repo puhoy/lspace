@@ -1,13 +1,16 @@
 import logging
+from pathlib import PurePath
 
 import click
 import yaml
+from typing import List
 from typing import Union
 
 from lspace.cli.import_command.add_book_to_db import add_book_to_db
 from lspace.cli.import_command.add_to_shelve import add_to_shelve
 from lspace.cli.import_command.check_if_in_library import check_if_in_library
 from lspace.cli.import_command.copy_to_library import copy_to_library
+from lspace.cli.import_command.import_from_calibre import CalibreWrapper
 from lspace.cli.import_command.import_options._options import other_choices
 from lspace.file_types import FileTypeBase
 from lspace.file_types import get_file_type_object
@@ -20,57 +23,90 @@ def bold(s):
     return click.style(s, bold=True)
 
 
+def is_calibre_library(path):
+    if PurePath(path).suffix == '.db':
+        c = CalibreWrapper(path)
+        library_id = None
+        try:
+            library_id = c.get_library_id()
+        except Exception as e:
+            logger.exception('', exc_info=True)
+            pass
+
+        if library_id:
+            return True
+
+    return False
+
+
 def import_wizard(path, skip_library_check, move):
     # type: (str, bool, bool) -> Union[Book, None]
     click.echo(bold('importing ') + path)
 
+    if is_calibre_library(path):
+        if click.confirm('this looks like a calibre library - import?', default=True):
+            c = CalibreWrapper(path)
+            for book_path, book in c.import_books():
+                import_file_wizard(book_path, skip_library_check, move, metadata=[book])
+            return
+
+    return import_file_wizard(path, skip_library_check, move)
+
+
+def import_file_wizard(path, skip_library_check, move, metadata=None):
+    # type: (str, bool, bool, List[Book]) -> Union[Book, None]
+
     try:
-        f = get_file_type_object(path)
+        file_type_object = get_file_type_object(path)
     except Exception as e:
         logger.exception('error reading {path}'.format(path=path), exc_info=True)
         click.secho('error reading {path}'.format(path=path), fg='red')
         return
 
-    if f:
-        if not skip_library_check and Book.query.filter_by(md5sum=f.get_md5()).first():
-            click.echo(bold('already imported') + ', skipping...')
-            return
-
-        isbns_with_metadata = f.fetch_results()
-
-        if len(isbns_with_metadata) == 0:
-            click.echo('could not find any isbn or metadata for %s' % f.filename)
-            choice = choose_result(f, [])
-
-        else:
-            choice = choose_result(f, isbns_with_metadata)
-
-        logger.debug('choice was %s' % choice)
-
-        while choice in list(other_choices.keys()):
-            # if choice is one of "other choices", its not one of the results,
-            # but one of the strings mapped to functions
-
-            function_that_gets_new_choices = other_choices.get(choice)['function']
-            isbns_with_metadata = function_that_gets_new_choices(file_type_object=f,
-                                                                 old_choices=isbns_with_metadata,
-                                                                 )
-
-            if isbns_with_metadata is not False:
-                choice = choose_result(f, isbns_with_metadata)
-            else:
-                # "skip" is the only function that returns false here
-                choice = False
-
-        if choice:
-            book = _import(f, choice, move)
-            return book
-        else:
-            click.echo('skipping %s' % path, color='yellow')
-
-    else:
+    if not file_type_object:
         # skip, because we have no class to read this file
         click.echo('skipping %s' % path)
+        return
+
+
+    if not skip_library_check and Book.query.filter_by(md5sum=file_type_object.get_md5()).first():
+        click.echo(bold('already imported') + ', skipping...')
+        return
+
+    if not metadata:
+        isbns_with_metadata = file_type_object.fetch_results()
+    else:
+        isbns_with_metadata = metadata
+
+    if len(isbns_with_metadata) == 0:
+        click.echo('could not find any isbn or metadata for %s' % file_type_object.filename)
+        choice = choose_result(file_type_object, [])
+
+    else:
+        choice = choose_result(file_type_object, isbns_with_metadata)
+
+    logger.debug('choice was %s' % choice)
+
+    while choice in list(other_choices.keys()):
+        # if choice is one of "other choices", its not one of the results,
+        # but one of the strings mapped to functions
+
+        function_that_gets_new_choices = other_choices.get(choice)['function']
+        isbns_with_metadata = function_that_gets_new_choices(file_type_object=file_type_object,
+                                                             old_choices=isbns_with_metadata,
+                                                             )
+
+        if isbns_with_metadata is not False:
+            choice = choose_result(file_type_object, isbns_with_metadata)
+        else:
+            # "skip" is the only function that returns false here
+            choice = False
+
+    if choice:
+        book = _import(file_type_object, choice, move)
+        return book
+    else:
+        click.echo('skipping %s' % file_type_object.filename, color='yellow')
 
 
 def choose_result(file_type_object, isbns_with_metadata):
@@ -155,7 +191,6 @@ def _import(file_type_object, book_choice, move_file):
     if not do_import:
         click.echo(bold('skipping {path}'.format(path=file_type_object.path)))
         return
-
 
     add_to_shelve(book_choice)
 
