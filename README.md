@@ -16,7 +16,13 @@ python >=3.4 and pip should be fine
 
 ## installation
 
+#### from pypi (latest release)
+
 `pip install lspace`
+
+#### from github (probably-not-so-stable-dev-stuff)
+
+`pip install git+https://github.com/puhoy/lspace.git`
 
 
 ## setup 
@@ -74,6 +80,11 @@ the default field names, in case nothing is specified in import
 `lspace import path/to/ebook.epub`
 
 `lspace import path/to/folder/*`
+
+#### import from calibre library
+
+`lspace import path/to/calibre_library/metadata.db`
+
 
 ### searching your library
 
