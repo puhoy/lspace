@@ -1,10 +1,11 @@
+import datetime
 import sqlite3
+import xml.etree.ElementTree as ET
 from collections import namedtuple
-from pathlib import PurePath, Path
+from pathlib import Path
 
 from typing import Generator
 from typing import List
-import xml.etree.ElementTree as ET
 
 from lspace.models import Book, Author
 
@@ -41,9 +42,15 @@ class CalibreWrapper:
                 authors.append(author)
 
             book = Book()
-            book.title = calibre_meta.title
-            book.isbn13 = calibre_meta.isbn
+            book.from_dict({
+                'Title': calibre_meta.title,
+                'ISBN-13': calibre_meta.isbn,
+                'Year': calibre_meta.year,
+                'Publisher': calibre_meta.publisher,
+                'Language': calibre_meta.language
+            })
             book.authors = authors
+            book.metadata_source = 'calibre'
 
             files_in_book_path = [str(p) for p in abs_book_path.glob('*') if
                                   not (str(p).endswith('metadata.opf') or str(p).endswith('cover.jpg'))]
@@ -115,6 +122,28 @@ class CalibreMetaFile:
     @property
     def isbn(self):
         node = self.root[0].find('dc:identifier[@opf:scheme="ISBN"]', CalibreMetaFile.ns)
+        if node is None:
+            return None
+        return node.text
+
+    @property
+    def publisher(self):
+        node = self.root[0].find('dc:publisher', CalibreMetaFile.ns)
+        if node is None:
+            return None
+        return node.text
+
+    @property
+    def year(self):
+        node = self.root[0].find('dc:date', CalibreMetaFile.ns)
+        if node is None:
+            return None
+        d = datetime.datetime.fromisoformat(node.text)
+        return d.year
+
+    @property
+    def language(self):
+        node = self.root[0].find('dc:language', CalibreMetaFile.ns)
         if node is None:
             return None
         return node.text

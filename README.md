@@ -60,6 +60,8 @@ where the imported files are stored
 
 #### loglevel
 
+the default python loglevels (debug, info, error, exception)
+
 #### default_{shelve, author, language, publisher}
 
 the default field names, in case nothing is specified in import
@@ -112,6 +114,37 @@ this command will ask you before it actually deletes stuff :)
 would convert all books matching on QUERY to 'mobi' and export them to ~/some/folder
 
 to actually export to another format, you need "ebook-convert", which is part of [calibre](https://calibre-ebook.com/)!
+
+## setting up a dev env
+
+1. clone this repo 
+
+2. make a virtualenv and activate it
+
+
+    virtualenv  env --python=python
+    
+    source env/bin/activate  # for bash
+    
+    # or
+    #. env/bin/activate.fish  # for fish
+
+3. set up a separate config to not mess up your regular installation
+
+
+    # initialize a new config file at a separate path
+    LSPACE_CONFIG=~/.config/lspace_dev/config.yml lspace init
+    
+    # change the database path! (otherwise it would still use the regular db)
+    sed -i 's/lspace\/lspace.db/lspace_dev\/lspace.db/g' ~/.config/lspace_dev/config.yml
+    
+    # also, if you want, set the loglevel to something else
+    
+    
+after this, just set LSPACE_CONFIG to your new config file before you start to try new stuff
+
+    export LSPACE_CONFIG=~/.config/lspace_dev/config.yml  # bash
+    set -gx LSPACE_CONFIG ~/.config/lspace_dev/config.yml  # fish 
 
 ## why "L-space"?
 
