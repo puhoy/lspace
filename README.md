@@ -153,8 +153,9 @@ source env/bin/activate  # for bash
 # initialize a new config file at a separate path
 LSPACE_CONFIG=~/.config/lspace_dev/config.yml lspace init
 
-# change the database path! (otherwise it would still use the regular db)
+# change the database and library path! (otherwise it would still use the regular db)
 sed -i 's/lspace\/lspace.db/lspace_dev\/lspace.db/g' ~/.config/lspace_dev/config.yml
+sed -i 's/~\/library/~\/library_dev/g' ~/.config/lspace_dev/config.yml
 
 # also, if you want, set the loglevel to something else
 ``` 
