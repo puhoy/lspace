@@ -16,7 +16,13 @@ python >=3.4 and pip should be fine
 
 ## installation
 
+#### from pypi (latest release)
+
 `pip install lspace`
+
+#### from github (probably-not-so-stable-dev-stuff)
+
+`pip install git+https://github.com/puhoy/lspace.git`
 
 
 ## setup 
@@ -60,6 +66,8 @@ where the imported files are stored
 
 #### loglevel
 
+the default python loglevels (debug, info, error, exception)
+
 #### default_{shelve, author, language, publisher}
 
 the default field names, in case nothing is specified in import
@@ -72,6 +80,11 @@ the default field names, in case nothing is specified in import
 `lspace import path/to/ebook.epub`
 
 `lspace import path/to/folder/*`
+
+#### import from calibre library
+
+`lspace import path/to/calibre_library/metadata.db`
+
 
 ### searching your library
 
@@ -112,6 +125,47 @@ this command will ask you before it actually deletes stuff :)
 would convert all books matching on QUERY to 'mobi' and export them to ~/some/folder
 
 to actually export to another format, you need "ebook-convert", which is part of [calibre](https://calibre-ebook.com/)!
+
+## setting up a dev env
+
+#### 1. clone this repo 
+
+#### 2. make a virtualenv and activate it
+
+```
+virtualenv  env --python=python
+
+source env/bin/activate  # for bash
+
+# or
+#. env/bin/activate.fish  # for fish
+```
+
+#### 3. install requirements
+
+```
+    pip install  -e .[dev]
+```
+
+#### 4. set up a separate config to not mess up your regular installation
+
+```
+# initialize a new config file at a separate path
+LSPACE_CONFIG=~/.config/lspace_dev/config.yml lspace init
+
+# change the database and library path! (otherwise it would still use the regular db)
+sed -i 's/lspace\/lspace.db/lspace_dev\/lspace.db/g' ~/.config/lspace_dev/config.yml
+sed -i 's/~\/library/~\/library_dev/g' ~/.config/lspace_dev/config.yml
+
+# also, if you want, set the loglevel to something else
+``` 
+    
+after this, just set LSPACE_CONFIG to your new config file before you start to try new stuff
+
+```
+export LSPACE_CONFIG=~/.config/lspace_dev/config.yml  # bash
+set -gx LSPACE_CONFIG ~/.config/lspace_dev/config.yml  # fish 
+```
 
 ## why "L-space"?
 
