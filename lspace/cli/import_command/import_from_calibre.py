@@ -1,4 +1,3 @@
-import datetime
 import sqlite3
 import xml.etree.ElementTree as ET
 from collections import namedtuple
@@ -6,7 +5,7 @@ from pathlib import Path
 
 from typing import Generator
 from typing import List
-
+from dateutil.parser import parse
 from lspace.models import Book, Author
 
 CalibreBook = namedtuple('Book', ['path'])
@@ -108,7 +107,7 @@ class CalibreMetaFile:
         node = self.root[0].find('dc:date', CalibreMetaFile.ns)
         if node is None:
             return None
-        d = datetime.datetime.fromisoformat(node.text)
+        d = parse(node.text)
         return d.year
 
     @property
