@@ -117,34 +117,43 @@ to actually export to another format, you need "ebook-convert", which is part of
 
 ## setting up a dev env
 
-1. clone this repo 
+#### 1. clone this repo 
 
-2. make a virtualenv and activate it
+#### 2. make a virtualenv and activate it
 
+```
+virtualenv  env --python=python
 
-    virtualenv  env --python=python
-    
-    source env/bin/activate  # for bash
-    
-    # or
-    #. env/bin/activate.fish  # for fish
+source env/bin/activate  # for bash
 
-3. set up a separate config to not mess up your regular installation
+# or
+#. env/bin/activate.fish  # for fish
+```
 
+#### 3. install requirements
 
-    # initialize a new config file at a separate path
-    LSPACE_CONFIG=~/.config/lspace_dev/config.yml lspace init
-    
-    # change the database path! (otherwise it would still use the regular db)
-    sed -i 's/lspace\/lspace.db/lspace_dev\/lspace.db/g' ~/.config/lspace_dev/config.yml
-    
-    # also, if you want, set the loglevel to something else
-    
+```
+    pip install  -e .[dev]
+```
+
+#### 4. set up a separate config to not mess up your regular installation
+
+```
+# initialize a new config file at a separate path
+LSPACE_CONFIG=~/.config/lspace_dev/config.yml lspace init
+
+# change the database path! (otherwise it would still use the regular db)
+sed -i 's/lspace\/lspace.db/lspace_dev\/lspace.db/g' ~/.config/lspace_dev/config.yml
+
+# also, if you want, set the loglevel to something else
+``` 
     
 after this, just set LSPACE_CONFIG to your new config file before you start to try new stuff
 
-    export LSPACE_CONFIG=~/.config/lspace_dev/config.yml  # bash
-    set -gx LSPACE_CONFIG ~/.config/lspace_dev/config.yml  # fish 
+```
+export LSPACE_CONFIG=~/.config/lspace_dev/config.yml  # bash
+set -gx LSPACE_CONFIG ~/.config/lspace_dev/config.yml  # fish 
+```
 
 ## why "L-space"?
 
