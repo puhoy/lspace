@@ -7,6 +7,7 @@ requirements = [
     "EbookLib==0.17.1",
     "Flask==1.0.3",
     "Flask-Migrate==2.5.2",
+    "flask-restplus==0.12.1",
     "Flask-SQLAlchemy==2.4.0",
     "flask-whooshee==0.7.0",
     "html2text==2018.1.9",

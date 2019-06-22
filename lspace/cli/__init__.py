@@ -11,6 +11,7 @@ from .tools_command import tools
 from .remove_command import remove
 from .reimport_command import reimport
 from .export_command import export
+from .web_command import web
 from .version_command import version
 
 if os.environ.get('LSPACE_DEV', None) == '1':
