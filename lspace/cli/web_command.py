@@ -19,6 +19,6 @@ def web(host, port):
     )
 
     if os.environ.get('LSPACE_DEV', None) == '1':
-        app.run(host='0.0.0.0', debug=True, **kwargs)
-
-    app.run(**kwargs)
+        app.run(debug=True, **kwargs)
+    else:
+        app.run(**kwargs)

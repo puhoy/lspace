@@ -12,7 +12,8 @@ class AuthorCollection(Resource):
     @api.expect(pagination_arguments, validate=True)
     @api.marshal_with(get_paginated_model(author_with_books_model))
     def get(self, **kwargs):
-        return Author.query.all()
+        args = pagination_arguments.parse_args()
+        return Author.query.paginate(page=args['page'], per_page=args['per_page'], error_out=False)
 
 
 @api.route('/authors/<int:id>')
