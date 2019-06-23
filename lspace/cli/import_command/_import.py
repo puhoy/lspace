@@ -7,7 +7,7 @@ from typing import List
 from typing import Union
 
 from lspace.cli.import_command.add_book_to_db import add_book_to_db
-from lspace.cli.import_command.add_to_shelve import add_to_shelve
+from lspace.cli.import_command.add_to_shelf import add_to_shelf
 from lspace.cli.import_command.check_if_in_library import check_if_in_library
 from lspace.cli.import_command.copy_to_library import copy_to_library
 from lspace.cli.import_command.import_from_calibre import CalibreWrapper
@@ -192,7 +192,7 @@ def _import(file_type_object, book_choice, move_file):
         click.echo(bold('skipping {path}'.format(path=file_type_object.path)))
         return
 
-    add_to_shelve(book_choice)
+    add_to_shelf(book_choice)
 
     path_in_library = copy_to_library(file_type_object.path, book_choice, move_file)
     if path_in_library:

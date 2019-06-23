@@ -39,7 +39,7 @@ database_path: sqlite:////home/USER/.config/lspace/lspace.db
 file_format: '{SHELVE}/{AUTHORS}_{TITLE}'
 library_path: ~/library
 loglevel: error
-default_shelve: misc
+default_shelf: misc
 default_author: no author
 default_language: no language
 default_publisher: no publisher
@@ -68,7 +68,7 @@ where the imported files are stored
 
 the default python loglevels (debug, info, error, exception)
 
-#### default_{shelve, author, language, publisher}
+#### default_{shelf, author, language, publisher}
 
 the default field names, in case nothing is specified in import
 

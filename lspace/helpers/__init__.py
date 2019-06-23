@@ -18,7 +18,7 @@ def get_default_config(app_dir):
         'library_path': '~/library',
         'file_format': '{AUTHORS}/{TITLE}',
         'loglevel': 'error',
-        'default_shelve': 'misc',
+        'default_shelf': 'misc',
         'default_author': 'no author',
         'default_language': 'no language',
         'default_publisher': 'no publisher'
