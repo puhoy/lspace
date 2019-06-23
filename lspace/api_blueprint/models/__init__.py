@@ -35,7 +35,11 @@ def get_paginated_model(model):
     })
     return paginate_model
 
-
+def get_filters(*fields):
+    filter_fields = reqparse.RequestParser()
+    for field in fields:
+        filter_fields.add_argument(field, type=str, required=False, store_missing=False)
+    return filter_fields
 
 pagination_arguments = reqparse.RequestParser()
 pagination_arguments.add_argument('page', type=int, required=False)
