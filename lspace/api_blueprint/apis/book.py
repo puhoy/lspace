@@ -8,7 +8,7 @@ from lspace.models import Book, Shelf, Author
 book_filters = ['title', 'publisher', 'shelf', 'author', 'md5sum', 'language']
 
 filter_map = {
-    'shelf': Shelf.name.ilike,
+    'shelf': lambda value: Book.shelf.has(Shelf.name.ilike(value)),
     'author': lambda value: Book.authors.any(Author.name.ilike(value)),
 
     '__default': lambda key, value: getattr(Book, key).ilike(value)

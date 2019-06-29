@@ -6,7 +6,6 @@ def get_pagination_arguments():
     pagination_arguments = reqparse.RequestParser()
     pagination_arguments.add_argument('page', type=int, required=False)
     pagination_arguments.add_argument('per_page', type=int, required=False, default=50)
-    pagination_arguments.add_argument('max_per_page', type=int, required=False, default=50)
     return pagination_arguments
 
 
@@ -72,8 +71,7 @@ class SqlAlchemyResource:
                 args = get_pagination_arguments().parse_args()
                 filter_args = resource_filters.parse_args()
                 q = SqlAlchemyResource.apply_filter_map(resource_model.query, filter_args, resource_filter_map)
-                q: Pagination = q.paginate(page=args['page'], per_page=args['per_page'], max_per_page=args['max_per_page'],
-                           error_out=False)
+                q: Pagination = q.paginate(page=args['page'], per_page=args['per_page'], error_out=False)
                 return q
 
         return Collection
