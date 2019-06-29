@@ -24,3 +24,6 @@ author_with_books_model = api.inherit('AuthorWithBooks', author_model, {
     'books': fields.List(fields.Nested(book_model))
 })
 
+shelf_with_books_model = api.inherit('ShelfWithBooks', author_model, {
+    'books': fields.List(fields.Nested(book_model))
+})
