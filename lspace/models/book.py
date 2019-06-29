@@ -34,18 +34,18 @@ class Book(db.Model):
     metadata_source = Column(String(20), default='')
 
     shelve_id = Column(Integer, ForeignKey('shelves.id'))
-    shelve = relationship("Shelve", back_populates="books", cascade="")
+    shelf = relationship("Shelf", back_populates="books", cascade="")
 
     @property
-    def shelve_name(self):
-        if self.shelve:
-            return self.shelve.name
+    def shelf_name(self):
+        if self.shelf:
+            return self.shelf.name
         else:
-            return current_app.config['USER_CONFIG']['default_shelve']
+            return current_app.config['USER_CONFIG']['default_shelf']
 
     @property
-    def shelve_name_slug(self):
-        return slugify(self.shelve_name)
+    def shelf_name_slug(self):
+        return slugify(self.shelf_name)
 
     @property
     def language_slug(self):
@@ -160,8 +160,8 @@ class Book(db.Model):
         for author in self.authors:
             db.session.add(author)
 
-        if self.shelve:
-            db.session.add(self.shelve)
+        if self.shelf:
+            db.session.add(self.shelf)
 
         db.session.add(self)
 
