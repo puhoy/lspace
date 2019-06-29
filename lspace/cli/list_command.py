@@ -20,8 +20,8 @@ def _list(query, path, details):
     if details:
         for result in results:
             head = '{result.authors_names} - {result.title}'.format(result=result)
-            if result.shelve:
-                head += ' ({result.shelve.name})'.format(result=result)
+            if result.shelf:
+                head += ' ({result.shelf.name})'.format(result=result)
             click.echo(head)
 
             click.echo('{result.full_path}'.format(result=result))

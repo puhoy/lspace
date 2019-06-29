@@ -36,10 +36,10 @@ this will setup a new configuration file, which you can edit to specify the stru
 a default config file would look like this:
 ```
 database_path: sqlite:////home/USER/.config/lspace/lspace.db
-file_format: '{SHELVE}/{AUTHORS}_{TITLE}'
+file_format: '{SHELF}/{AUTHORS}_{TITLE}'
 library_path: ~/library
 loglevel: error
-default_shelve: misc
+default_shelf: misc
 default_author: no author
 default_language: no language
 default_publisher: no publisher
@@ -54,11 +54,11 @@ the project uses sqlalchemy, so all databases supported by sqlalchemy should be 
 
 template string for storing the plain files in the library.
 
-`{SHELVE}/{AUTHORS}_{TITLE}` would produce files like `scifi/cixin-liu_three-body-problem.epub`
+`{SHELF}/{AUTHORS}_{TITLE}` would produce files like `scifi/cixin-liu_three-body-problem.epub`
 
 author and title will be automatically slugified for this.
 
-possible variables to use are: AUTHORS, TITLE, SHELVE, YEAR, LANGUAGE, PUBLISHER
+possible variables to use are: AUTHORS, TITLE, SHELF, YEAR, LANGUAGE, PUBLISHER
 
 #### library path
 
@@ -68,7 +68,7 @@ where the imported files are stored
 
 the default python loglevels (debug, info, error, exception)
 
-#### default_{shelve, author, language, publisher}
+#### default_{shelf, author, language, publisher}
 
 the default field names, in case nothing is specified in import
 

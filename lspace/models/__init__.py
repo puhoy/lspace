@@ -1,5 +1,5 @@
 from .author import Author
 from .book import Book
-from .shelve import Shelve
+from .shelf import Shelf
 
 from .book_author_association import book_author_association_table

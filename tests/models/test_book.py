@@ -8,7 +8,7 @@ import unittest
 from flask_migrate import upgrade
 
 from lspace import create_app, db
-from lspace.models import Book, Author, Shelve
+from lspace.models import Book, Author, Shelf
 
 
 def get_test_app(test_dir):
@@ -84,17 +84,17 @@ class BookTest(unittest.TestCase):
             author = Author.query.all()
             assert len(author) == 1
 
-    def test_adding_book_with_shelve(self):
+    def test_adding_book_with_shelf(self):
         """
-        adding a book should not cascade over shelve
+        adding a book should not cascade over shelf
 
         :return:
         """
         with self.getApp().app_context():
             author = Author(name='author')
-            shelve = Shelve(name='genre')
-            book_1 = Book(title='book_1', authors=[author], shelve=shelve)
-            book_2 = Book(title='book_2', authors=[author], shelve=shelve)
+            shelf = Shelf(name='genre')
+            book_1 = Book(title='book_1', authors=[author], shelf=shelf)
+            book_2 = Book(title='book_2', authors=[author], shelf=shelf)
 
             book_1.save()
             db.session.flush()
@@ -102,5 +102,5 @@ class BookTest(unittest.TestCase):
         with self.getApp().app_context():
             books = Book.query.all()
             assert len(books) == 1
-            author = Shelve.query.all()
+            author = Shelf.query.all()
             assert len(author) == 1
