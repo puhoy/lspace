@@ -16,7 +16,7 @@ def get_default_config(app_dir):
         'database_path': 'sqlite:///{APP_DIR}/lspace.db'.format(
             APP_DIR=app_dir),
         'library_path': '~/library',
-        'file_format': '{AUTHORS}/{TITLE}',
+        'file_format': '{SHELF}/{AUTHORS}/{TITLE}',
         'loglevel': 'error',
         'default_shelf': 'misc',
         'default_author': 'no author',
