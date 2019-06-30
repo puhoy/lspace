@@ -15,10 +15,12 @@ def add_gnu_tp_header(response):
     return response
 
 
-from lspace.api_blueprint.apis.book import alchemy_book
-from lspace.api_blueprint.apis.author import alchemy_author
-from lspace.api_blueprint.apis.shelf import alchemy_shelf
+from lspace.api_blueprint.resources.book import alchemy_book
+from lspace.api_blueprint.resources.author import alchemy_author
+from lspace.api_blueprint.resources.shelf import alchemy_shelf
+from lspace.api_blueprint.resources.book_file import BookFile
 
+from lspace.api_blueprint.resources.version import Version
 
 api.add_resource(alchemy_book.get_item(), '/books/<int:id>')
 api.add_resource(alchemy_book.get_collection(), '/books/')
@@ -29,4 +31,7 @@ api.add_resource(alchemy_author.get_collection(), '/authors/')
 api.add_resource(alchemy_shelf.get_item(), '/shelves/<int:id>')
 api.add_resource(alchemy_shelf.get_collection(), '/shelves/')
 
-from lspace.api_blueprint.apis.version import Version
+api.add_resource(BookFile, '/files/books/<md5sum>')
+#api.add_resource('', '/files/covers/<md5>')
+
+api.add_resource(Version, '/version/')

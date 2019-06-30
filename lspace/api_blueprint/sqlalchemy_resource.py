@@ -25,7 +25,7 @@ class SqlAlchemyResource:
         self.filters = get_filters(*filters)
         self.filter_map = filter_map
 
-        self.paginated_model = api_object.model('Page', {
+        self.paginated_model = api_object.model(self.model.__name__ + 'Page', {
             'prev_num': fields.Integer,
             'next_num': fields.Integer,
             'has_next': fields.Boolean,

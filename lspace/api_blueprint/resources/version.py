@@ -1,10 +1,5 @@
 from flask_restplus import Resource
 
-from lspace.api_blueprint import api
-
-
-@api.route('/version')
-@api.route('/version/')
 class Version(Resource):
 
     def get(self, **kwargs):
