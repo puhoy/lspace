@@ -4,14 +4,14 @@ import click
 
 from lspace.app import app
 from lspace.cli import cli
+from lspace.api_v1_blueprint import api_blueprint
 
 
 @cli.command(help='start a webserver')
 @click.option('--port', default=5000)
 @click.option('--host', default='0.0.0.0')
 def web(host, port):
-    from lspace.api_blueprint import api_blueprint
-    app.register_blueprint(api_blueprint)
+    app.register_blueprint(api_blueprint, url_prefix='/api/v1')
 
     kwargs = dict(
         host=host,

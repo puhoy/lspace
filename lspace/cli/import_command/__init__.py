@@ -5,7 +5,7 @@ from lspace.cli.import_command._import import import_wizard
 
 
 @cli.command(name='import', help='import ebooks into your database')
-@click.argument('document_path', type=click.Path(exists=True), nargs=-1)
+@click.argument('document_path', type=click.Path(), nargs=-1)
 @click.option('--skip-library-check', help='dont check if this file is in the library already', default=False,
               is_flag=True)
 @click.option('--move', help='move imported files instead copying', default=False, is_flag=True)

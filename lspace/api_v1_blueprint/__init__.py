@@ -8,19 +8,12 @@ api = Api(api_blueprint, version='1.0', title='L-Space API',
     description='L-Space API',
 )
 
-@api_blueprint.after_request
-def add_gnu_tp_header(response):
-    # www.gnuterrypratchett.com
-    response.headers.add("X-Clacks-Overhead", "GNU Terry Pratchett")
-    return response
+from lspace.api_v1_blueprint.resources.book import alchemy_book
+from lspace.api_v1_blueprint.resources.author import alchemy_author
+from lspace.api_v1_blueprint.resources.shelf import alchemy_shelf
+from lspace.api_v1_blueprint.resources.book_file import BookFile
 
-
-from lspace.api_blueprint.resources.book import alchemy_book
-from lspace.api_blueprint.resources.author import alchemy_author
-from lspace.api_blueprint.resources.shelf import alchemy_shelf
-from lspace.api_blueprint.resources.book_file import BookFile
-
-from lspace.api_blueprint.resources.version import Version
+from lspace.api_v1_blueprint.resources.version import Version
 
 api.add_resource(alchemy_book.get_item(), '/books/<int:id>')
 api.add_resource(alchemy_book.get_collection(), '/books/')

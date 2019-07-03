@@ -66,4 +66,10 @@ def create_app(config_path=None, app_dir=None):
 
     whooshee.init_app(app)
 
+    @app.after_request
+    def add_gnu_tp_header(response):
+        # www.gnuterrypratchett.com
+        response.headers.add("X-Clacks-Overhead", "GNU Terry Pratchett")
+        return response
+
     return app

@@ -1,6 +1,7 @@
 import logging
 from pathlib import PurePath
-
+from urllib.parse import urlparse, ParseResult
+import requests
 import click
 import yaml
 from typing import List
@@ -10,6 +11,7 @@ from lspace.cli.import_command.add_book_to_db import add_book_to_db
 from lspace.cli.import_command.add_to_shelf import add_to_shelf
 from lspace.cli.import_command.check_if_in_library import check_if_in_library
 from lspace.cli.import_command.copy_to_library import copy_to_library
+from lspace.cli.import_command.import_from_api import ApiImporter
 from lspace.cli.import_command.import_from_calibre import CalibreWrapper
 from lspace.cli.import_command.import_options._options import other_choices
 from lspace.file_types import FileTypeBase
@@ -39,16 +41,36 @@ def is_calibre_library(path):
     return False
 
 
+def is_api(url):
+    parsed: ParseResult = urlparse(url)
+    path = parsed.path
+
+    clean_api_path = '/api/v1/'
+    if clean_api_path in path:
+        # todo: fetch /version ?
+        return True
+
+    return True
+
+
 def import_wizard(path, skip_library_check, move):
     # type: (str, bool, bool) -> Union[Book, None]
     click.echo(bold('importing ') + path)
 
     if is_calibre_library(path):
         if click.confirm('this looks like a calibre library - import?', default=True):
-            c = CalibreWrapper(path)
-            for book_path, book in c.import_books():
+            calibre_importer = CalibreWrapper(path)
+            for book_path, book in calibre_importer.import_books():
                 import_file_wizard(book_path, skip_library_check, move, metadata=[book])
             return
+
+    if is_api(path):
+        if click.confirm('this looks like the lspace api - import?', default=True):
+            api_importer = ApiImporter(path)
+            for book_path, book in api_importer.import_books():
+                import_file_wizard(book_path, skip_library_check, move=False, metadata=[book])
+            return
+        return
 
     return import_file_wizard(path, skip_library_check, move)
 
@@ -67,7 +89,6 @@ def import_file_wizard(path, skip_library_check, move, metadata=None):
         # skip, because we have no class to read this file
         click.echo('skipping %s' % path)
         return
-
 
     if not skip_library_check and Book.query.filter_by(md5sum=file_type_object.get_md5()).first():
         click.echo(bold('already imported') + ', skipping...')

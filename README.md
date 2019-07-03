@@ -2,7 +2,14 @@
 
 a cli ebook manager built around [isbnlib](https://github.com/xlcnd/isbnlib)
 
-currently supports epub and pdf
+when importing it tries to find isbns in the files metadata and in the text 
+to fetch correct metadata about the book. 
+also, it gets metadata from google books and openlibrary based on the filename.
+
+after this, your properly renamed files will be stored in your library folder.
+
+
+currently supports epub and pdf.
 
 
 [![Build Status](https://travis-ci.org/puhoy/lspace.svg?branch=master)](https://travis-ci.org/puhoy/lspace)
