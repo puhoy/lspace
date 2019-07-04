@@ -1,7 +1,8 @@
 from apispec import APISpec
+from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_restplus import Resource, reqparse
 from flask_restplus._http import HTTPStatus
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, post_load
 
 
 def get_pagination_arguments():
@@ -18,7 +19,17 @@ def get_filters(*fields):
     return filter_fields
 
 
-from apispec.ext.marshmallow import MarshmallowPlugin
+def get_paginated_marshmallow_schema(marshmallow_schema):
+    class Paginated(Schema):
+        prev_num = fields.Integer(allow_none=True)
+        next_num = fields.Integer(allow_none=True)
+        has_next = fields.Boolean()
+        has_prev = fields.Boolean()
+        items = fields.Nested(marshmallow_schema, many=True)
+
+    Paginated.__name__ = 'Paginated' + marshmallow_schema.__name__
+    return Paginated
+
 
 # https://github.com/noirbizarre/flask-restplus/issues/438#issuecomment-490951796
 def resolver(schema):
@@ -31,7 +42,7 @@ class SqlAlchemyResource:
         self.api_object = api_object
         self.alchemy_model = model
         self.marshmallow_schema = marshmallow_schema
-        self.paginated_marshmallow_schema = self.get_paginated_marshmallow_schema(marshmallow_schema)
+        self.paginated_marshmallow_schema = get_paginated_marshmallow_schema(marshmallow_schema)
         self.filters = get_filters(*filters)
         self.filter_map = filter_map
 
@@ -53,18 +64,6 @@ class SqlAlchemyResource:
         self.swagger_schema_model = self.api_object.schema_model(self.marshmallow_schema.__name__, json_schema)
         self.swagger_paginated_schema_model = \
             self.api_object.schema_model(self.paginated_marshmallow_schema.__name__, paginated_json_schema)
-
-    @classmethod
-    def get_paginated_marshmallow_schema(cls, marshmallow_schema):
-        class Paginated(Schema):
-            prev_num = fields.Integer()
-            next_num = fields.Integer()
-            has_next = fields.Boolean()
-            has_prev = fields.Boolean()
-            items = fields.Nested(marshmallow_schema, many=True)
-
-        Paginated.__name__ = 'Paginated' + marshmallow_schema.__name__
-        return Paginated
 
     @classmethod
     def apply_filter_map(cls, query, filter_args, filter_map):

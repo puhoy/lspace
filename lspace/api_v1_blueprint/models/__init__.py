@@ -5,7 +5,7 @@ from lspace.models import Author, Shelf, Book
 
 class ShelfSchema(Schema):
     id = fields.Int()
-    name = fields.String()
+    name = fields.String(required=False)
 
     @post_load
     def make_shelf(self, data, **kwargs):
@@ -33,8 +33,8 @@ class BookSchema(Schema):
     id = fields.Int()
     title = fields.String()
     authors = fields.Nested(AuthorSchema, many=True)
-    shelf = fields.Nested(ShelfSchema)
-    isbn13 = fields.String()
+    shelf = fields.Nested(ShelfSchema, allow_none=True)
+    isbn13 = fields.String(default=None, allow_none=True)
     md5sum = fields.String()
     publisher = fields.String()
     metadata_source = fields.String()
@@ -44,17 +44,18 @@ class BookSchema(Schema):
 
     @post_load
     def make_book(self, data, **kwargs):
+        print('making book!')
         book = Book()
-        book.title = self.title
-        book.authors = self.authors
-        book.shelf = self.shelf
-        book.isbn13 = self.isbn13
-        book.md5sum = self.md5sum
-        book.publisher = self.publisher
-        book.metadata_source = self.metadata_source
-        book.year = self.year
-        book.language = self.language
-        book.file = self.file
+        book.title = data['title']
+        book.authors = data['authors']
+        book.shelf = data['shelf']
+        book.isbn13 = data['isbn13']
+        book.md5sum = data['md5sum']
+        book.publisher = data['publisher']
+        book.metadata_source = data['metadata_source']
+        book.year = data['year']
+        book.language = data['language']
+        #book.file = data['file']
         return book
 
 
@@ -63,4 +64,3 @@ class ShelfWithBooksSchema(ShelfSchema):
 
 class AuthorWithBooksSchema(AuthorSchema):
     books = fields.Nested(BookSchema, many=True)
-

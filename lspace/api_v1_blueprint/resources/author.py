@@ -11,7 +11,7 @@ filter_map = {
 }
 
 alchemy_author = SqlAlchemyResource(api_object=api,
-                                  model=Author,
-                                  marshmallow_schema=AuthorWithBooksSchema,
-                                  filters=author_filters,
-                                  filter_map=filter_map)
+                                    model=Author,
+                                    marshmallow_schema=AuthorWithBooksSchema,
+                                    filters=author_filters,
+                                    filter_map=filter_map)
