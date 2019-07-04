@@ -1,7 +1,6 @@
 from apispec import APISpec
 from flask_restplus import Resource, reqparse
 from flask_restplus._http import HTTPStatus
-from flask_sqlalchemy import Pagination
 from marshmallow import Schema, fields
 
 
@@ -101,7 +100,7 @@ class SqlAlchemyResource:
                 filter_args = wrapper_self.filters.parse_args()
                 q = SqlAlchemyResource.apply_filter_map(wrapper_self.alchemy_model.query, filter_args,
                                                         wrapper_self.filter_map)
-                q: Pagination = q.paginate(page=args['page'], per_page=args['per_page'], error_out=False)
+                q = q.paginate(page=args['page'], per_page=args['per_page'], error_out=False)
 
                 return wrapper_self.paginated_marshmallow_schema().dump(q).data, HTTPStatus.OK
 

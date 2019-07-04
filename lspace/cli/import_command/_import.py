@@ -42,7 +42,7 @@ def is_calibre_library(path):
 
 
 def is_api(url):
-    parsed: ParseResult = urlparse(url)
+    parsed = urlparse(url)
     path = parsed.path
 
     clean_api_path = '/api/v1/'

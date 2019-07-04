@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 
 requirements = [
     "alembic==1.0.10",
+    "apispec==2.0.1",
     "Click==7.0",
     "colorama==0.4.1",
     "EbookLib==0.17.1",

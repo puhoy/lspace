@@ -1,8 +1,3 @@
-from flask import url_for
-from flask_restplus import fields
-
-from lspace.api_v1_blueprint import api
-from lspace.api_v1_blueprint.resources.book_file import BookFile
 from marshmallow import Schema, fields, post_load
 
 from lspace.models import Author, Shelf, Book
