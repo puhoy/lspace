@@ -82,7 +82,7 @@ class SqlAlchemyResource:
             @wrapper_self.api_object.response(200, "OK", wrapper_self.swagger_schema_model)
             def get(self, id, **kwargs):
                 return wrapper_self.marshmallow_schema().dump(
-                    wrapper_self.alchemy_model.query.get(id)).data, HTTPStatus.OK
+                    wrapper_self.alchemy_model.query.get(id)), HTTPStatus.OK
 
         return Item
 
@@ -101,6 +101,6 @@ class SqlAlchemyResource:
                                                         wrapper_self.filter_map)
                 q = q.paginate(page=args['page'], per_page=args['per_page'], error_out=False)
 
-                return wrapper_self.paginated_marshmallow_schema().dump(q).data, HTTPStatus.OK
+                return wrapper_self.paginated_marshmallow_schema().dump(q), HTTPStatus.OK
 
         return Collection

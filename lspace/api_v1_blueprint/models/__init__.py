@@ -1,3 +1,4 @@
+from flask import url_for
 from marshmallow import Schema, fields, post_load
 
 from lspace.models import Author, Shelf, Book
@@ -40,7 +41,16 @@ class BookSchema(Schema):
     metadata_source = fields.String()
     year = fields.Integer()
     language = fields.String()
-    file = fields.Url()
+    url = fields.Method(serialize='get_url',
+                        deserialize='load_url')
+
+    def get_url(self, book):
+        return url_for('api.book_file', md5sum=book.md5sum)
+
+    def load_url(self, value):
+        return value
+
+    # 'file': fields.String(attribute=lambda book: url_for('api.book_file', md5sum=book.md5sum))
 
     @post_load
     def make_book(self, data, **kwargs):
@@ -55,12 +65,13 @@ class BookSchema(Schema):
         book.metadata_source = data['metadata_source']
         book.year = data['year']
         book.language = data['language']
-        #book.file = data['file']
+        book.url = data['url']
         return book
 
 
 class ShelfWithBooksSchema(ShelfSchema):
     books = fields.Nested(BookSchema, many=True)
+
 
 class AuthorWithBooksSchema(AuthorSchema):
     books = fields.Nested(BookSchema, many=True)

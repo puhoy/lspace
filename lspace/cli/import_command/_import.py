@@ -67,7 +67,7 @@ def import_wizard(path, skip_library_check, move):
     if is_api(path):
         if click.confirm('this looks like the lspace api - import?', default=True):
             api_importer = ApiImporter(path)
-            for book_path, book in api_importer.import_books():
+            for book_path, book in api_importer.import_books(skip_library_check=skip_library_check):
                 import_file_wizard(book_path, skip_library_check, move=False, metadata=[book])
             return
         return

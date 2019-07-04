@@ -36,6 +36,8 @@ class Book(db.Model):
     shelve_id = Column(Integer, ForeignKey('shelves.id'))
     shelf = relationship("Shelf", back_populates="books", cascade="")
 
+    url = None
+
     @property
     def shelf_name(self):
         if self.shelf:
