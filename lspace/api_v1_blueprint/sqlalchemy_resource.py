@@ -19,10 +19,9 @@ def get_filters(*fields):
     return filter_fields
 
 
-# https://github.com/noirbizarre/flask-restplus/issues/438#issuecomment-490951796
 from apispec.ext.marshmallow import MarshmallowPlugin
 
-
+# https://github.com/noirbizarre/flask-restplus/issues/438#issuecomment-490951796
 def resolver(schema):
     return None
 
@@ -31,11 +30,15 @@ class SqlAlchemyResource:
 
     def __init__(self, api_object, model, marshmallow_schema, filters, filter_map):
         self.api_object = api_object
-        self.model = model
+        self.alchemy_model = model
         self.marshmallow_schema = marshmallow_schema
+        self.paginated_marshmallow_schema = self.get_paginated_marshmallow_schema(marshmallow_schema)
         self.filters = get_filters(*filters)
         self.filter_map = filter_map
 
+        self._setup_swagger()
+
+    def _setup_swagger(self):
         self.spec = APISpec(
             title=self.api_object.title,
             version=self.api_object.version,
@@ -46,18 +49,22 @@ class SqlAlchemyResource:
         schema2jsonschema = self.spec.plugins.pop().openapi.schema2jsonschema
 
         json_schema = schema2jsonschema(schema=self.marshmallow_schema)
-        paginated_json_schema = schema2jsonschema(schema=self.get_paginated_marshmallow_schema())
-        self.schema_model = self.api_object.schema_model(self.marshmallow_schema.__name__, json_schema)
-        self.paginated_schema_model = self.api_object.schema_model(self.get_paginated_marshmallow_schema().__name__, paginated_json_schema)
+        paginated_json_schema = schema2jsonschema(schema=self.paginated_marshmallow_schema)
 
-    def get_paginated_marshmallow_schema(self):
+        self.swagger_schema_model = self.api_object.schema_model(self.marshmallow_schema.__name__, json_schema)
+        self.swagger_paginated_schema_model = \
+            self.api_object.schema_model(self.paginated_marshmallow_schema.__name__, paginated_json_schema)
+
+    @classmethod
+    def get_paginated_marshmallow_schema(cls, marshmallow_schema):
         class Paginated(Schema):
             prev_num = fields.Integer()
             next_num = fields.Integer()
             has_next = fields.Boolean()
             has_prev = fields.Boolean()
-            items = fields.Nested(self.marshmallow_schema, many=True)
-        Paginated.__name__ = self.marshmallow_schema.__name__ + 'Paginated'
+            items = fields.Nested(marshmallow_schema, many=True)
+
+        Paginated.__name__ = 'Paginated' + marshmallow_schema.__name__
         return Paginated
 
     @classmethod
@@ -71,39 +78,31 @@ class SqlAlchemyResource:
         return query.filter(*filters)
 
     def get_item(self):
-        resource_marshmallow_schema = self.marshmallow_schema
-        resource_model = self.model
-        resource_schema_model = self.schema_model
-        resource_api_object = self.api_object
+        wrapper_self = self
 
         class Item(Resource):
-            @resource_api_object.response(200, "OK", resource_schema_model)
+            @wrapper_self.api_object.response(200, "OK", wrapper_self.swagger_schema_model)
             def get(self, id, **kwargs):
-                return resource_marshmallow_schema().dump(resource_model.query.get(id)).data, HTTPStatus.OK
+                return wrapper_self.marshmallow_schema().dump(
+                    wrapper_self.alchemy_model.query.get(id)).data, HTTPStatus.OK
 
         return Item
 
     def get_collection(self):
-        resource_api_object = self.api_object
-        resource_filters = self.filters
-        resource_model = self.model
-        resource_filter_map = self.filter_map
-        resource_paginated_json_schema = self.paginated_schema_model
-
-        resource_paginated_schema = self.get_paginated_marshmallow_schema()
+        wrapper_self = self
 
         class Collection(Resource):
 
-
-            @resource_api_object.expect(resource_filters, validate=True)
-            @resource_api_object.expect(get_pagination_arguments(), validate=True)
-            @resource_api_object.response(200, "OK", resource_paginated_json_schema)
+            @wrapper_self.api_object.expect(wrapper_self.filters, validate=True)
+            @wrapper_self.api_object.expect(get_pagination_arguments(), validate=True)
+            @wrapper_self.api_object.response(200, "OK", wrapper_self.swagger_paginated_schema_model)
             def get(self, **kwargs):
                 args = get_pagination_arguments().parse_args()
-                filter_args = resource_filters.parse_args()
-                q = SqlAlchemyResource.apply_filter_map(resource_model.query, filter_args, resource_filter_map)
+                filter_args = wrapper_self.filters.parse_args()
+                q = SqlAlchemyResource.apply_filter_map(wrapper_self.alchemy_model.query, filter_args,
+                                                        wrapper_self.filter_map)
                 q: Pagination = q.paginate(page=args['page'], per_page=args['per_page'], error_out=False)
-                print(resource_paginated_schema().dump(q).data)
-                return resource_paginated_schema().dump(q).data, HTTPStatus.OK
+
+                return wrapper_self.paginated_marshmallow_schema().dump(q).data, HTTPStatus.OK
 
         return Collection

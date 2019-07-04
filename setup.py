@@ -17,6 +17,7 @@ requirements = [
     "lxml==4.3.4",
     "Mako==1.0.12",
     "MarkupSafe==1.1.1",
+    "marshmallow==2.19.5",
     "PyPDF2==1.26.0",
     "python-dateutil==2.8.0",
     "python-editor==1.0.4",
