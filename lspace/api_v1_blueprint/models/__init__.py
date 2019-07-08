@@ -41,6 +41,7 @@ class BookSchema(Schema):
     metadata_source = fields.String()
     year = fields.Integer()
     language = fields.String()
+    path = fields.String()
     url = fields.Method(serialize='get_url',
                         deserialize='load_url')
 
@@ -65,6 +66,7 @@ class BookSchema(Schema):
         book.metadata_source = data['metadata_source']
         book.year = data['year']
         book.language = data['language']
+        book.path = data['path']
         book.url = data['url']
         return book
 

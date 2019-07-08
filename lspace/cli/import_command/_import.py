@@ -1,7 +1,7 @@
 import logging
 from pathlib import PurePath
-from urllib.parse import urlparse, ParseResult
-import requests
+from urllib.parse import urlparse
+
 import click
 import yaml
 from typing import List
@@ -43,10 +43,11 @@ def is_calibre_library(path):
 
 def is_api(url):
     parsed = urlparse(url)
+    scheme = parsed.scheme
     path = parsed.path
 
     clean_api_path = '/api/v1/'
-    if clean_api_path in path:
+    if scheme in ['http', 'https'] and clean_api_path in path:
         # todo: fetch /version ?
         return True
 
@@ -69,7 +70,6 @@ def import_wizard(path, skip_library_check, move):
             api_importer = ApiImporter(path)
             for book_path, book in api_importer.import_books(skip_library_check=skip_library_check):
                 import_file_wizard(book_path, skip_library_check, move=False, metadata=[book])
-            return
         return
 
     return import_file_wizard(path, skip_library_check, move)

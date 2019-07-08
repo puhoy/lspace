@@ -93,7 +93,7 @@ class Book(db.Model):
     @property
     def extension(self):
         # type: () -> str
-        filename, file_extension = os.path.splitext(self.full_path)
+        filename, file_extension = os.path.splitext(self.path)
         return file_extension
 
     @staticmethod

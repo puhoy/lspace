@@ -44,9 +44,7 @@ def export(query, export_path, format):
 
         target_in_export_path = find_unused_path(export_path,
                                                  current_app.config['USER_CONFIG']['file_format'],
-                                                 source_path=result.full_path,
-                                                 book=result,
-                                                 extension=target_extension)
+                                                 book=result)
         target_path = os.path.join(export_path, target_in_export_path)
         if not os.path.isdir(os.path.dirname(target_path)):
             os.makedirs(os.path.dirname(target_path))

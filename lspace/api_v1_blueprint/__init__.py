@@ -28,3 +28,5 @@ api.add_resource(BookFile, '/files/books/<md5sum>')
 #api.add_resource('', '/files/covers/<md5>')
 
 api.add_resource(Version, '/version/')
+
+

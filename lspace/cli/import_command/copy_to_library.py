@@ -23,7 +23,6 @@ def copy_to_library(source_path, book, move_file):
     library_path = current_app.config['USER_CONFIG']['library_path']
     path_in_library = find_unused_path(library_path,
                                        current_app.config['USER_CONFIG']['file_format'],
-                                       source_path,
                                        book)
     target_path = os.path.join(library_path, path_in_library)
 
@@ -47,8 +46,8 @@ def copy_to_library(source_path, book, move_file):
     return path_in_library
 
 
-def find_unused_path(base_path, book_path_format, source_path, book, extension=None):
-    # type: (str, str, str, Book) -> str
+def find_unused_path(base_path, book_path_format, book):
+    # type: (str, str, Book) -> str
     """
 
     :param base_path: path to the library
@@ -59,8 +58,6 @@ def find_unused_path(base_path, book_path_format, source_path, book, extension=N
     # create the path for the book
 
     count = 0
-    if not extension:
-        _, extension = os.path.splitext(source_path)
 
     while count < 100:
         path_from_base_path = book_path_format.format(
@@ -78,11 +75,11 @@ def find_unused_path(base_path, book_path_format, source_path, book, extension=N
             path_from_base_path = path_from_base_path[1:]
 
         if count == 0:
-            path_from_base_path += extension
+            path_from_base_path += book.extension
         else:
             path_from_base_path = '{path_from_base_path}_{count}{extension}'.format(
                 path_from_base_path=path_from_base_path,
-                count=count, extension=extension)
+                count=count, extension=book.extension)
 
         target_path = os.path.join(base_path, path_from_base_path)
 
