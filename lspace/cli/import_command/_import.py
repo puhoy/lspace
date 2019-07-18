@@ -68,7 +68,7 @@ def import_wizard(path, skip_library_check, move):
     if is_api(path):
         if click.confirm('this looks like the lspace api - import?', default=True):
             api_importer = ApiImporter(path)
-            for book_path, book in api_importer.import_books(skip_library_check=skip_library_check):
+            for book_path, book in api_importer.start_import(skip_library_check=skip_library_check):
                 import_file_wizard(book_path, skip_library_check, move=False, metadata=[book])
         return
 
@@ -91,7 +91,7 @@ def import_file_wizard(path, skip_library_check, move, metadata=None):
         return
 
     if not skip_library_check and Book.query.filter_by(md5sum=file_type_object.get_md5()).first():
-        click.echo(bold('already imported') + ', skipping...')
+        click.echo(bold('already imported') + ', skipping' + path)
         return
 
     if not metadata:

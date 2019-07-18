@@ -1,13 +1,19 @@
+import logging
 import os
+import re
 import tempfile
 from urllib.parse import urlparse, parse_qs, urlsplit, urlunsplit, urlencode
 
 import requests
 from flask import current_app
+from typing import List
 
 from lspace.api_v1_blueprint.models import BookSchema, AuthorWithBooksSchema, ShelfWithBooksSchema
 from lspace.api_v1_blueprint.sqlalchemy_resource import get_paginated_marshmallow_schema
 from lspace.cli.import_command.copy_to_library import find_unused_path
+from lspace.models import Book
+
+logger = logging.getLogger(__name__)
 
 PaginatedBookSchema = get_paginated_marshmallow_schema(BookSchema)
 PaginatedAuthorWithBooksSchema = get_paginated_marshmallow_schema(AuthorWithBooksSchema)
@@ -39,26 +45,6 @@ def download_file(url, destination_path):
     return True
 
 
-def get_book(url):
-    pass
-
-
-def get_authors(url):
-    pass
-
-
-def get_author(url):
-    pass
-
-
-def get_shelve(url):
-    pass
-
-
-def get_shelves(url):
-    pass
-
-
 session = requests.session()
 
 
@@ -78,45 +64,78 @@ class ApiImporter:
 
         self.detail_path = splits[2]
 
-        self.detail_path_imprt_function_map = {
-            '^(?:books\/)$': self.get_books,
-            '^(?:books\/)([0-9]+)$': get_book,
-            'authors/': get_authors,
-            '^(?:authors\/)([0-9]+)$': get_author,
-            'shelves/': get_shelves,
-            '^(?:shelves\/)([0-9]+)$': get_shelve,
+        self.detail_path_import_function_map = {
+            '^(?:books\/)$': self.fetch_from_books_route,
+            '^(?:books\/)([0-9]+)$': self.fetch_from_book_route,
+            '^(?:authors\/)$': self.fetch_from_authors_route,
+            '^(?:authors\/)([0-9]+)$': self.fetch_from_author_route,
+            '^(?:shelves\/)$': self.fetch_from_shelves_route,
+            '^(?:shelves\/)([0-9]+)$': self.fetch_from_shelf_route,
         }
 
     def fetch_from_books_route(self):
-        
         next_url = self.url
         while next_url:
-        
             paginated_response = session.get(next_url).json()
             paginated_books = PaginatedBookSchema().load(paginated_response)
 
             books = paginated_books['items']
-
             yield from self.get_books(books)
-
             next_url = _get_next_page_url(next_url, paginated_response)
 
-            print(next_url)
+    def fetch_from_book_route(self):
+        book_response = session.get(self.url).json()
+
+        book = BookSchema().load(book_response)
+
+        return self.get_books([book])
+
+    def fetch_from_authors_route(self):
+        next_url = self.url
+        while next_url:
+            response_json = session.get(next_url).json()
+            for author in response_json['items']:
+                books = BookSchema().load(author['books'], many=True)
+                yield from self.get_books(books)
+            next_url = _get_next_page_url(next_url, response_json)
+
+    def fetch_from_author_route(self):
+        author_response = session.get(self.url).json()
+        books = BookSchema().load(author_response['books'], many=True)
+        return self.get_books(books)
+
+    def fetch_from_shelf_route(self):
+        shelf_response = session.get(self.url).json()
+        books = BookSchema().load(shelf_response['books'], many=True)
+        return self.get_books(books)
+
+    def fetch_from_shelves_route(self):
+        next_url = self.url
+        while next_url:
+            response_json = session.get(next_url).json()
+            for shelf in response_json['items']:
+                books = BookSchema().load(shelf['books'], many=True)
+                yield from self.get_books(books)
+            next_url = _get_next_page_url(next_url, response_json)
+        pass
+
+    def get_book(self, tmpdirname, book):
+        temp_path = find_unused_path(tmpdirname, current_app.config['USER_CONFIG']['file_format'], book)
+        abs_temp_path = os.path.join(tmpdirname, temp_path)
+        if not os.path.isdir(os.path.dirname(abs_temp_path)):
+            os.makedirs(os.path.dirname(abs_temp_path))
+        book_url = urlunsplit((self.scheme, self.netloc, book.url, '', ''))
+        download_file(book_url, abs_temp_path)
+        return abs_temp_path, book
 
     def get_books(self, books):
-        # type: (List(Book)) -> (str, Book)
-
+        # type: (List[Book]) -> (str, Book)
         with tempfile.TemporaryDirectory() as tmpdirname:
             for book in books:
+                yield self.get_book(tmpdirname, book)
 
-                temp_path = find_unused_path(tmpdirname, current_app.config['USER_CONFIG']['file_format'], book)
-                abs_temp_path = os.path.join(tmpdirname, temp_path)
-                if not os.path.isdir(os.path.dirname(abs_temp_path)):
-                    os.makedirs(os.path.dirname(abs_temp_path))
-
-                book_url = urlunsplit((self.scheme, self.netloc, book.url, '', ''))
-                download_file(book_url, abs_temp_path)
-                yield abs_temp_path, book
-
-    def import_books(self, skip_library_check):
-        return self.fetch_from_books_route()
+    def start_import(self, skip_library_check):
+        for route_regex, function in self.detail_path_import_function_map.items():
+            if re.match(route_regex, self.detail_path):
+                yield from function()
+                return
