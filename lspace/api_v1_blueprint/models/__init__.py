@@ -1,6 +1,7 @@
 from flask import url_for
 from marshmallow import Schema, fields, post_load, EXCLUDE
 
+from lspace.api_v1_blueprint.resource_helpers import get_paginated_marshmallow_schema
 from lspace.models import Author, Shelf, Book
 
 
@@ -54,7 +55,6 @@ class BookSchema(Schema):
     def load_url(self, value):
         return value
 
-
     @post_load
     def make_book(self, data, **kwargs):
         book = Book.query.filter_by(md5sum=data['md5sum']).first()
@@ -91,7 +91,11 @@ class AuthorWithBooksSchema(AuthorSchema):
             author.name = data['name']
 
         for book in data['books']:
-            
             author.books.append(book)
 
         return author
+
+
+PaginatedAuthorWithBooksSchema = get_paginated_marshmallow_schema(AuthorWithBooksSchema)
+PaginatedBookSchema = get_paginated_marshmallow_schema(BookSchema)
+PaginatedShelfWithBooksSchema = get_paginated_marshmallow_schema(ShelfWithBooksSchema)

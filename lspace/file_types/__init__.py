@@ -11,6 +11,7 @@ mapping = {
 
 
 def get_file_type_object(path):
+    # type: (str) -> FileTypeBase
     filename, file_extension = os.path.splitext(path)
 
     file_class = mapping.get(file_extension, None)

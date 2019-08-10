@@ -47,11 +47,11 @@ def is_api(url):
     path = parsed.path
 
     clean_api_path = '/api/v1/'
-    if scheme in ['http', 'https'] and clean_api_path in path:
+    if (scheme in ['http', 'https']) and (clean_api_path in path):
         # todo: fetch /version ?
         return True
 
-    return True
+    return False
 
 
 def import_wizard(path, skip_library_check, move):
@@ -207,6 +207,8 @@ def _import(file_type_object, book_choice, move_file):
     # type: (FileTypeBase, Book, bool) -> Union[Book, None]
     logger.debug('importing %s, %s' % (file_type_object, book_choice))
     logger.debug(file_type_object)
+    
+    book_choice.path = file_type_object.path
 
     do_import = similar_books_decide_import(book_choice)
     if not do_import:

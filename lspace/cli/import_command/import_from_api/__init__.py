@@ -9,7 +9,7 @@ from flask import current_app
 from typing import List
 
 from lspace.api_v1_blueprint.models import BookSchema, AuthorWithBooksSchema, ShelfWithBooksSchema
-from lspace.api_v1_blueprint.sqlalchemy_resource import get_paginated_marshmallow_schema
+from lspace.api_v1_blueprint.resource_helpers import get_paginated_marshmallow_schema
 from lspace.cli.import_command.copy_to_library import find_unused_path
 from lspace.models import Book
 
