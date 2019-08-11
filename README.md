@@ -18,7 +18,7 @@ currently supports epub and pdf.
 
 ## requirements
 
-python >=3.4 and pip should be fine
+python >=3.5 and pip should be fine
 
 
 ## installation
