@@ -5,7 +5,7 @@ from lspace.api_v1_blueprint import api
 from lspace.api_v1_blueprint.models import AuthorWithBooksSchema, PaginatedAuthorWithBooksSchema
 from lspace.api_v1_blueprint.resource_helpers import get_pagination_args_parser, \
     add_fields_to_parser, \
-    apply_filter_map, get_swagger_model
+    get_swagger_model, run_query
 from lspace.models import Book, Author
 
 filter_fields = ['name']
@@ -27,9 +27,7 @@ class AuthorCollection(Resource):
         page = args.pop('page')
         per_page = args.pop('per_page')
 
-        query = apply_filter_map(Author.query, args, filter_map)
-        query = query.paginate(page=page, per_page=per_page, error_out=False)
-
+        query = run_query(Author, args, filter_map, page, per_page)
         return PaginatedAuthorWithBooksSchema().dump(query), HTTPStatus.OK
 
 

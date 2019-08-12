@@ -23,6 +23,8 @@ def get_paginated_marshmallow_schema(marshmallow_schema):
         next_num = fields.Integer(allow_none=True)
         has_next = fields.Boolean()
         has_prev = fields.Boolean()
+        total = fields.Integer()
+        page = fields.Integer()
         items = fields.Nested(marshmallow_schema, many=True)
 
     Paginated.__name__ = 'Paginated' + marshmallow_schema.__name__
@@ -54,3 +56,9 @@ def get_swagger_model(api_object, marshmallow_schema):
 
     swagger_schema_model = api_object.schema_model(marshmallow_schema.__name__, json_schema)
     return swagger_schema_model
+
+
+def run_query(Model, args, filter_map, page, per_page):
+    query = apply_filter_map(Model.query, args, filter_map)
+    query = query.paginate(page=page, per_page=per_page, error_out=False)
+    return query

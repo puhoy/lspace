@@ -5,9 +5,8 @@ from lspace.api_v1_blueprint import api
 from lspace.api_v1_blueprint.models import ShelfSchema, PaginatedShelfWithBooksSchema
 from lspace.api_v1_blueprint.resource_helpers import get_pagination_args_parser, \
     add_fields_to_parser, \
-    apply_filter_map, get_swagger_model
+    get_swagger_model, run_query
 from lspace.models import Shelf
-
 
 filter_fields = ['name']
 
@@ -19,7 +18,6 @@ filter_map = {
 }
 
 
-
 class ShelfCollection(Resource):
     @api.expect(args_parser, validate=True)
     @api.response(200, "OK", get_swagger_model(api, PaginatedShelfWithBooksSchema))
@@ -27,10 +25,7 @@ class ShelfCollection(Resource):
         args = args_parser.parse_args()
         page = args.pop('page')
         per_page = args.pop('per_page')
-
-        query = apply_filter_map(Shelf.query, args, filter_map)
-
-        query = query.paginate(page=page, per_page=per_page, error_out=False)
+        query = run_query(Shelf, args, filter_map, page, per_page)
 
         return PaginatedShelfWithBooksSchema().dump(query), HTTPStatus.OK
 
@@ -40,5 +35,3 @@ class ShelfItem(Resource):
     def get(self, id, **kwargs):
         shelf = Shelf.query.get(id)
         return ShelfSchema().dump(shelf), HTTPStatus.OK
-
-

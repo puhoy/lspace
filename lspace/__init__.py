@@ -1,3 +1,5 @@
+import flask
+
 __version__ = '0.3.0'
 
 import logging
@@ -33,7 +35,8 @@ logger = logging.getLogger(__name__)
 def create_app(config_path=None, app_dir=None):
     from .helpers import read_config
 
-    app = Flask(__name__)
+    app = Flask(__name__,
+                static_url_path='/_static', template_folder='/_templates') # we need /static for the frontend blueprint
 
     if not app_dir:
         app_dir = click.get_app_dir(APP_NAME)
@@ -63,6 +66,11 @@ def create_app(config_path=None, app_dir=None):
             migrate.init_app(app, db, render_as_batch=True, directory=migration_dir)
         else:
             migrate.init_app(app, db, directory=migration_dir)
+
+        def url_for_self(**args):
+            return flask.url_for(flask.request.endpoint, **{**flask.request.view_args, **flask.request.args, **args})
+
+        app.jinja_env.globals['url_for_self'] = url_for_self
 
     whooshee.init_app(app)
 

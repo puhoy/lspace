@@ -10,3 +10,5 @@ dist
 .coverage
 htmlcov
 *.pyc
+node_modules
+dist

@@ -1,0 +1,43 @@
+{% extends "base.html.jinja2" %}
+{% import 'macros.html.jinja2' as macros %}
+
+{% block content %}
+    <div class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-one-third">
+                    <h2 class="subtitle"><a href="{{ url_for('frontend.books') }}">L-Space</a></h2>
+                    <form method="GET" action="/">
+                        {{ form.hidden_tag() }}<br>
+                        <p><label class="label">{{ form.title.label }}</label>
+                            {{ form.title(size=20) }}</p>
+                        <p><label class="label">{{ form.publisher.label }}</label>
+                            {{ form.publisher(size=20) }}</p>
+                        <p><label class="label">{{ form.author.label }}</label>
+                            {{ form.author(size=20) }}</p>
+                        <p><label class="label">{{ form.language.label }}</label>
+                            {{ form.language(size=20) }}</p>
+                        <p><label class="label">{{ form.shelf.label }}</label>
+                            {{ form.shelf(size=20) }}</p>
+                        <p><label class="label"> {{ form.year.label }}</label>
+                            {{ form.year(size=20) }}</p>
+                        <input type="submit" value="Go">
+                    </form>
+                </div>
+                <div class="column">
+                    {{ macros.pagination(paginated_books ) }}
+                    <section class="section">
+                        <div class="container">
+                            {% for book in paginated_books['items'] %}
+                                <div class="box">
+                                    {{ macros.book(book) }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                    {{ macros.pagination(paginated_books ) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
