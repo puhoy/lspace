@@ -1,7 +1,5 @@
 from flask_restplus import Resource
 
-
-
 from flask import send_file
 from lspace.models import Book
 
@@ -18,4 +16,3 @@ class BookFile(Resource):
         return send_file(book.full_path,
                          as_attachment=True,
                          attachment_filename=attachment_filename)
-

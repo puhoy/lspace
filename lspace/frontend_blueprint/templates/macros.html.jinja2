@@ -17,7 +17,6 @@
                 <span class="nobreak">Shelf:<a
                         href="{{ url_for_self(shelf=book.shelf.name or 'default', page=1) }}">{{ book.shelf.name or 'default' }}</a></span>
                 <br>
-
             </div>
         </div>
         <div class="media-right">
@@ -61,4 +60,56 @@
 {% endmacro %}
 
 
+{% macro book_filter(form) %}
+    <form method="GET" action="/">
+        {{ form.hidden_tag() }}<br>
+        <div class="field">
+            <div class="control">
+                {{ form.title(size=20, class_="input", placeholder='title') }}
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                {{ form.publisher(size=20, class_="input", placeholder='publisher') }}
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                {{ form.author(size=20, class_="input", placeholder='author') }}
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                {{ form.language(size=20, class_="input", placeholder='language') }}
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                {{ form.shelf(size=20, class_="input", placeholder='shelf') }}
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                {{ form.year(size=20, class_="input", placeholder='year') }}
+            </div>
+        </div>
+        <input type="submit" value="Go" class="button">
+    </form>
+{% endmacro %}
+
+
+{% macro import_block() %}
+
+    <div class="content is-small">
+        <div class=" is-size-6">
+            <button class="button is-small" id="copy_button">copy</button>
+            import search results:
+        </div>
+        <pre><code class="is-size-7"
+                   id="import_string"></code></pre>
+
+        <div id="temp"></div>
+    </div>
+
+{% endmacro %}
 

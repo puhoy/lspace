@@ -10,9 +10,9 @@ from lspace.models import Book, Shelf, Author
 
 filter_fields = ['title', 'publisher', 'shelf', 'author', 'md5sum', 'language', 'year']
 
-
 args_parser = get_pagination_args_parser()
 add_fields_to_parser(args_parser, filter_fields)
+
 
 def filter_by_shelf(value):
     if value == 'default':
@@ -21,12 +21,14 @@ def filter_by_shelf(value):
     else:
         return Book.shelf.has(Shelf.name.ilike(value))
 
+
 filter_map = {
     'shelf': filter_by_shelf,
     'author': lambda value: Book.authors.any(Author.name.ilike(value)),
 
     '__default': lambda key, value: getattr(Book, key).ilike(value)
 }
+
 
 class BookCollection(Resource):
 

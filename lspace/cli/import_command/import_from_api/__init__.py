@@ -8,16 +8,11 @@ import requests
 from flask import current_app
 from typing import List
 
-from lspace.api_v1_blueprint.models import BookSchema, AuthorWithBooksSchema, ShelfWithBooksSchema
-from lspace.api_v1_blueprint.resource_helpers import get_paginated_marshmallow_schema
+from lspace.api_v1_blueprint.models import BookSchema, PaginatedBookSchema
 from lspace.cli.import_command.copy_to_library import find_unused_path
 from lspace.models import Book
 
 logger = logging.getLogger(__name__)
-
-PaginatedBookSchema = get_paginated_marshmallow_schema(BookSchema)
-PaginatedAuthorWithBooksSchema = get_paginated_marshmallow_schema(AuthorWithBooksSchema)
-PaginatedShelfWithBooksSchema = get_paginated_marshmallow_schema(ShelfWithBooksSchema)
 
 
 def _get_next_page_url(url, response):
@@ -66,11 +61,7 @@ class ApiImporter:
 
         self.detail_path_import_function_map = {
             '^(?:books\/)$': self.fetch_from_books_route,
-            '^(?:books\/)([0-9]+)$': self.fetch_from_book_route,
-            '^(?:authors\/)$': self.fetch_from_authors_route,
-            '^(?:authors\/)([0-9]+)$': self.fetch_from_author_route,
-            '^(?:shelves\/)$': self.fetch_from_shelves_route,
-            '^(?:shelves\/)([0-9]+)$': self.fetch_from_shelf_route,
+            '^(?:books\/)([0-9]+)$': self.fetch_from_book_route
         }
 
     def fetch_from_books_route(self):
@@ -85,39 +76,8 @@ class ApiImporter:
 
     def fetch_from_book_route(self):
         book_response = session.get(self.url).json()
-
         book = BookSchema().load(book_response)
-
         return self.get_books([book])
-
-    def fetch_from_authors_route(self):
-        next_url = self.url
-        while next_url:
-            response_json = session.get(next_url).json()
-            for author in response_json['items']:
-                books = BookSchema().load(author['books'], many=True)
-                yield from self.get_books(books)
-            next_url = _get_next_page_url(next_url, response_json)
-
-    def fetch_from_author_route(self):
-        author_response = session.get(self.url).json()
-        books = BookSchema().load(author_response['books'], many=True)
-        return self.get_books(books)
-
-    def fetch_from_shelf_route(self):
-        shelf_response = session.get(self.url).json()
-        books = BookSchema().load(shelf_response['books'], many=True)
-        return self.get_books(books)
-
-    def fetch_from_shelves_route(self):
-        next_url = self.url
-        while next_url:
-            response_json = session.get(next_url).json()
-            for shelf in response_json['items']:
-                books = BookSchema().load(shelf['books'], many=True)
-                yield from self.get_books(books)
-            next_url = _get_next_page_url(next_url, response_json)
-        pass
 
     def get_book(self, tmpdirname, book):
         temp_path = find_unused_path(tmpdirname, current_app.config['USER_CONFIG']['file_format'], book)

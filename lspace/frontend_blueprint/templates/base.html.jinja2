@@ -3,9 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <title>L-Space</title>
+
     <link rel="stylesheet" href="static/bulma.min.css">
+    <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-{% block content %}{% endblock %}
+<div class="section">
+    <div class="columns">
+        <div class="column is-one-third">
+            <div class="columns  is-multiline">
+                <div class="column is-full">
+                    <h2 class="title"><a class="has-text-dark" href="{{ url_for('frontend.books') }}">L-Space</a></h2>
+                </div>
+                <div class="column is-full">
+                    {{ macros.book_filter(form) }}
+                </div>
+                <div class="column is-full">
+                    {{ macros.import_block() }}
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+<script>
+    let urlRoot = window.location.origin;
+    let importString = `lspace import "${urlRoot}{{ url_for('api.book_collection', **import_vars) }}"`;
+    let importStringElement = document.getElementById("import_string");
+    importStringElement.innerText = importString;
+
+    // https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
+    function fallbackCopyTextToClipboard(text) {
+        let temp = document.getElementById('temp');
+        var textArea = document.createElement("textarea");
+        textArea.value = text;
+        temp.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            var successful = document.execCommand('copy');
+            var msg = successful ? 'successful' : 'unsuccessful';
+            console.log('Fallback: Copying text command was ' + msg);
+        } catch (err) {
+            console.error('Fallback: Oops, unable to copy', err);
+        }
+
+        temp.removeChild(textArea);
+    }
+
+    function copyTextToClipboard(text) {
+        if (!navigator.clipboard) {
+            fallbackCopyTextToClipboard(text);
+            return;
+        }
+        navigator.clipboard.writeText(text).then(function () {
+            console.log('Async: Copying to clipboard was successful!');
+        }, function (err) {
+            console.error('Async: Could not copy text: ', err);
+        });
+    }
+
+    let copyButton = document.getElementById('copy_button');
+    copyButton.addEventListener('click', function (event) {
+        copyTextToClipboard(importString);
+    });
+</script>
 </body>
 </html>

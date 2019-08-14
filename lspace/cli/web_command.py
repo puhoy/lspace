@@ -19,8 +19,6 @@ def web(host, port, debug):
     app.register_blueprint(api_blueprint, url_prefix='/api/v1')
     app.register_blueprint(frontend_blueprint, url_prefix='')
 
-    app.secret_key = os.urandom(30)
-
     if (os.environ.get('LSPACE_DEV', None) == '1') or debug:
         os.environ['FLASK_ENV'] = 'development'
         print(os.environ['FLASK_ENV'])

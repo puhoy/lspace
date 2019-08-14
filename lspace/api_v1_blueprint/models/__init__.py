@@ -75,27 +75,4 @@ class BookSchema(Schema):
         return book
 
 
-class ShelfWithBooksSchema(ShelfSchema):
-    books = fields.Nested(BookSchema, many=True)
-
-
-class AuthorWithBooksSchema(AuthorSchema):
-    books = fields.Nested(BookSchema, many=True)
-
-    @post_load
-    def make_author(self, data, **kwargs):
-        author = Author.query.filter_by(name=data['name']).first()
-
-        if not author:
-            author = Author()
-            author.name = data['name']
-
-        for book in data['books']:
-            author.books.append(book)
-
-        return author
-
-
-PaginatedAuthorWithBooksSchema = get_paginated_marshmallow_schema(AuthorWithBooksSchema)
 PaginatedBookSchema = get_paginated_marshmallow_schema(BookSchema)
-PaginatedShelfWithBooksSchema = get_paginated_marshmallow_schema(ShelfWithBooksSchema)
