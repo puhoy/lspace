@@ -136,6 +136,8 @@ to actually export to another format, you need "ebook-convert", which is part of
 
 `lspace web --host 0.0.0.0 --port 5000` 
 
+![L-Space web interface](https://raw.githubusercontent.com/puhoy/lspace/feature/api/lspace_screenshot.png "screenshot of the L-Space web interface")
+
 this also gives you the import command for your current search results!
 
 (or you can just download them manually..)
