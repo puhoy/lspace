@@ -35,8 +35,9 @@ def task_bump():
 def task_release_pypi():
     def confirm():
         res = input('running release on NON-test pypy!\n'
-                    'is the version bumped and everything commpted and pushed?'
-                    'everything tested?'
+                    'remember to install from a build to test if everytihng is included!\n'
+                    'is the version bumped and everything commited and pushed?\n'
+                    'everything tested?\n'
                     '[yesanditsnotatest/OHMYGODNO] ')
         if res != 'yesanditsnotatest':
             raise Exception
