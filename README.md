@@ -2,12 +2,11 @@
 
 a cli ebook manager built around [isbnlib](https://github.com/xlcnd/isbnlib)
 
-when importing it tries to find isbns in the files metadata and in the text 
-to fetch correct metadata about the book. 
-also, it gets metadata from google books and openlibrary based on the filename.
+when importing it tries to find isbns in the files metadata and in the text. 
+with the isbn it tries to fetch metadata about the book from google books and openlibrary. 
+if no isbn is found, it queries metadata based on the filename.
 
 after this, your properly renamed files will be stored in your library folder.
-
 
 currently supports epub and pdf.
 
@@ -132,6 +131,14 @@ this command will ask you before it actually deletes stuff :)
 would convert all books matching on QUERY to 'mobi' and export them to ~/some/folder
 
 to actually export to another format, you need "ebook-convert", which is part of [calibre](https://calibre-ebook.com/)!
+
+### browse & share your books via webserver
+
+`lspace web --host 0.0.0.0 --port 5000` 
+
+this also gives you the import command for your current search results!
+
+(or you can just download them manually..)
 
 ## setting up a dev env
 

@@ -2,6 +2,7 @@ from flask import Blueprint
 from flask import render_template
 from flask import request
 from flask_wtf import FlaskForm
+from typing import Dict
 from wtforms import StringField
 
 from lspace.api_v1_blueprint.resource_helpers import run_query
@@ -39,7 +40,12 @@ def books():
             getattr(form, field).data = value
 
     paginated_books = run_query(Book, book_args, book_filter_map, page, per_page)
-    import_vars = {**request.args}
+
+    # set up vars for import string
+    import_vars = dict()
+    for k, v in  dict(**request.args).items():
+        if v:
+            import_vars[k] = v
     import_vars.pop('page', None)
     import_vars.pop('per_page', None)
     return render_template("books.html.jinja2", paginated_books=paginated_books, form=form, import_vars=import_vars)

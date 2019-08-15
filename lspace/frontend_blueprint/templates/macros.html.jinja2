@@ -13,16 +13,16 @@
                         href="{{ url_for_self(publisher=book.publisher or 'None', page=1) }}">{{ book.publisher or 'None' }}</a></span>
                 <br>
                 <span class="nobreak">Year: <a
-                        href="{{ url_for_self(year=book.year or 'None', page=1) }}">{{ book.year or 'None' }}</a></span><br>
+                        href="{{ url_for_self(year=book.year, page=1) }}">{{ book.year }}</a></span><br>
                 <span class="nobreak">Shelf:<a
                         href="{{ url_for_self(shelf=book.shelf.name or 'default', page=1) }}">{{ book.shelf.name or 'default' }}</a></span>
                 <br>
             </div>
         </div>
         <div class="media-right">
-            <figure class="image is-64x64">
+            <!--<figure class="image is-64x64">
                 <img src="https://bulma.io/images/placeholders/128x128.png" alt="Image">
-            </figure>
+            </figure>-->
             <a href="{{ url_for('api.book_file', md5sum=book.md5sum) }}">Download</a>
         </div>
     </article>
@@ -62,8 +62,8 @@
 
 {% macro book_filter(form) %}
     <form method="GET" action="/">
-        {{ form.hidden_tag() }}<br>
         <div class="field">
+            <div class="label">search</div>
             <div class="control">
                 {{ form.title(size=20, class_="input", placeholder='title') }}
             </div>
@@ -92,6 +92,7 @@
             <div class="control">
                 {{ form.year(size=20, class_="input", placeholder='year') }}
             </div>
+            <p class="help">case insensitive. use % as wildcard!</p>
         </div>
         <input type="submit" value="Go" class="button">
     </form>

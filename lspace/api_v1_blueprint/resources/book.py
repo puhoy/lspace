@@ -16,17 +16,26 @@ add_fields_to_parser(args_parser, filter_fields)
 
 def filter_by_shelf(value):
     if value == 'default':
-        print('default value')
         return Book.shelf == None
     else:
         return Book.shelf.has(Shelf.name.ilike(value))
 
+def filter_by_author(value):
+    if value == 'None':
+        return Book.authors == None
+    else:
+        return Book.authors.any(Author.name.ilike(value))
+
+
+def default_filter(key, value):
+    if value in ['None', ]:
+        return getattr(Book, key) == None
+    return getattr(Book, key).ilike(value)
 
 filter_map = {
     'shelf': filter_by_shelf,
-    'author': lambda value: Book.authors.any(Author.name.ilike(value)),
-
-    '__default': lambda key, value: getattr(Book, key).ilike(value)
+    'author': filter_by_author,
+    '__default': default_filter
 }
 
 

@@ -1,14 +1,12 @@
 import os
 
 import click
+import gunicorn.app.base
 
+from lspace.api_v1_blueprint import api_blueprint
 from lspace.app import app
 from lspace.cli import cli
-from lspace.api_v1_blueprint import api_blueprint
 from lspace.frontend_blueprint import frontend_blueprint
-
-from gunicorn.arbiter import Arbiter
-from gunicorn.config import Config
 
 
 @cli.command(help='start a webserver')
@@ -24,19 +22,32 @@ def web(host, port, debug):
         print(os.environ['FLASK_ENV'])
         app.run(debug=True, host=host, port=port)
     else:
-        from gunicorn.app.base import Application
+        options = {
+            'bind': '{HOST}:{PORT}'.format(HOST=host, PORT=port)
+        }
+        StandaloneApplication(app, options).run()
 
-        class FlaskApplication(Application):
-            def init(self, parser, opts, args):
-                return {
-                    'bind': '{0}:{1}'.format(host, port),
-                    'workers': 4
-                }
 
-            def load(self):
-                return app
+# http://docs.gunicorn.org/en/latest/custom.html
+class StandaloneApplication(gunicorn.app.base.BaseApplication):
 
-        FlaskApplication().run()
+    def __init__(self, app, options=None):
+        self.options = options or {}
+        self.application = app
+        super(StandaloneApplication, self).__init__()
 
-        arbiter = Arbiter(app)
-        arbiter.run()
+    def load_config(self):
+        config = dict([(key, value) for key, value in self.options.items()
+                       if key in self.cfg.settings and value is not None])
+        for key, value in config.items():
+            self.cfg.set(key.lower(), value)
+
+    def load(self):
+        return self.application
+
+
+if __name__ == '__main__':
+    options = {
+        'bind': '%s:%s' % ('127.0.0.1', '8080'),
+        'workers': 4,
+    }
