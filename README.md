@@ -17,7 +17,7 @@ currently supports epub and pdf.
 
 ## requirements
 
-python >=3.5 and pip should be fine
+python >=3.5 and pip
 
 
 ## installation
@@ -91,6 +91,12 @@ the default field names, in case nothing is specified in import
 
 `lspace import path/to/calibre_library/metadata.db`
 
+#### import from lspace api
+
+`lspace import http://<some-address>/api/v1/`
+
+the web interface (`lspace web` - scroll down a bit!) generates import strings based on your search! 
+
 
 ### searching your library
 
@@ -136,7 +142,7 @@ to actually export to another format, you need "ebook-convert", which is part of
 
 `lspace web --host 0.0.0.0 --port 5000` 
 
-![L-Space web interface](https://raw.githubusercontent.com/puhoy/lspace/feature/api/lspace_screenshot.png "screenshot of the L-Space web interface")
+![L-Space web interface](https://raw.githubusercontent.com/puhoy/lspace/master/lspace_screenshot.png "screenshot of the L-Space web interface")
 
 this also gives you the import command for your current search results!
 
