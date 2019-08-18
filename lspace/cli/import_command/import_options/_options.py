@@ -3,9 +3,11 @@ from lspace.cli.import_command.import_options.manual_import import ManualImport
 from lspace.cli.import_command.import_options.manual_search import ManualSearch
 from lspace.cli.import_command.import_options.peek import Peek
 from lspace.cli.import_command.import_options.skip_book import SkipBook
+from lspace.cli.import_command.import_options.find_more import FindMoreResults
 
 other_choices = {
     'q': ManualSearch.get_dict(),
+    'f': FindMoreResults.get_dict(),
     'i': ISBNLookup.get_dict(),
     'p': Peek.get_dict(),
     'm': ManualImport.get_dict(),

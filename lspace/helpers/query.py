@@ -41,7 +41,7 @@ def _get_metadata_for_isbn(isbn, service='openl'):
 def query_isbn_data(isbn_str):
     # type: (str) -> Book
 
-    if isbnlib.is_isbn10(isbn_str):
+    if isbn_str and isbnlib.is_isbn10(isbn_str):
         isbn_str = isbnlib.to_isbn13(isbn_str)
 
     logger.info('query openlibrary for %s' % isbn_str)

@@ -16,6 +16,7 @@ class FileTypeBase:
 
     def __init__(self, path):
         self.path = path
+        self.results = self.iter_results()
 
     def get_text(self):
         raise NotImplementedError
@@ -85,17 +86,27 @@ class FileTypeBase:
             return guessed_meta
         return []
 
-    def fetch_results(self):
-        find_functions = [self.find_isbn_in_metadata,
-                          self.find_isbn_in_text,
-                          self.find_isbn_from_author_title,
-                          self.find_isbn_from_filename]
-        results = {}
-        for f in find_functions:
-            for result in f():
-                results[result.isbn13] = result
-        self.results = list(results.values())
-        return self.results
+    def iter_results(self):
+        isbn_find_functions = [self.find_isbn_in_metadata,
+                               self.find_isbn_in_text]
+
+        other_metadata_find_functions = [self.find_isbn_from_author_title]
+        filename_find_functions = [self.find_isbn_from_filename]
+        while True:
+            results = {}
+            for f in isbn_find_functions:
+                for result in f():
+                    results[result.isbn13] = result
+
+            if results:
+                yield list(results.values())
+
+            results = {}
+            for f in other_metadata_find_functions + filename_find_functions:
+                for result in f():
+                    results[result.isbn13] = result
+
+            yield list(results.values())
 
 
     def _filter_symbols(self, s):
@@ -122,7 +133,7 @@ class FileTypeBase:
         pages = self.get_text()
         pages_as_str = '\n'.join(pages)
 
-        isbns = isbnlib.get_isbnlike(pages_as_str, level='normal')
+        isbns = isbnlib.get_isbnlike(pages_as_str, level='loose')
 
         # print('unprocessed isbns: %s' % isbns)
         canonical_isbns = preprocess_isbns(isbns)

@@ -95,17 +95,14 @@ def import_file_wizard(path, skip_library_check, move, metadata=None):
         return
 
     if not metadata:
-        isbns_with_metadata = file_type_object.fetch_results()
+        isbns_with_metadata = next(file_type_object.results)
     else:
         isbns_with_metadata = metadata
 
     if len(isbns_with_metadata) == 0:
         click.echo('could not find any isbn or metadata for %s' % file_type_object.filename)
-        choice = choose_result(file_type_object, [])
 
-    else:
-        choice = choose_result(file_type_object, isbns_with_metadata)
-
+    choice = choose_result(file_type_object, isbns_with_metadata)
     logger.debug('choice was %s' % choice)
 
     while choice in list(other_choices.keys()):
