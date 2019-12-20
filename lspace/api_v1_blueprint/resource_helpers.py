@@ -41,23 +41,6 @@ def apply_filter_map(query, filter_args, filter_map):
     return query.filter(*filters)
 
 
-def get_swagger_model(api_object, marshmallow_schema):
-    # https://github.com/noirbizarre/flask-restplus/issues/438#issuecomment-490951796
-    spec = APISpec(
-        title=api_object.title,
-        version=api_object.version,
-        openapi_version="2.0",
-        plugins=[MarshmallowPlugin(schema_name_resolver=lambda _: None)],
-        info=dict(description=api_object.description)
-    )
-    schema2jsonschema = spec.plugins.pop().openapi.schema2jsonschema
-
-    json_schema = schema2jsonschema(schema=marshmallow_schema)
-
-    swagger_schema_model = api_object.schema_model(marshmallow_schema.__name__, json_schema)
-    return swagger_schema_model
-
-
 def run_query(Model, args, filter_map, page, per_page):
     query = apply_filter_map(Model.query, args, filter_map)
     query = query.paginate(page=page, per_page=per_page, error_out=False)

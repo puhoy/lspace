@@ -4,8 +4,7 @@ from flask_restplus._http import HTTPStatus
 from lspace.api_v1_blueprint import api
 from lspace.api_v1_blueprint.models import BookSchema, PaginatedBookSchema
 from lspace.api_v1_blueprint.resource_helpers import get_pagination_args_parser, \
-    add_fields_to_parser, \
-    get_swagger_model, run_query
+    add_fields_to_parser, run_query
 from lspace.models import Book, Shelf, Author
 
 filter_fields = ['title', 'publisher', 'shelf', 'author', 'md5sum', 'language', 'year']
@@ -20,6 +19,7 @@ def filter_by_shelf(value):
     else:
         return Book.shelf.has(Shelf.name.ilike(value))
 
+
 def filter_by_author(value):
     if value == 'None':
         return Book.authors == None
@@ -32,6 +32,7 @@ def default_filter(key, value):
         return getattr(Book, key) == None
     return getattr(Book, key).ilike(value)
 
+
 filter_map = {
     'shelf': filter_by_shelf,
     'author': filter_by_author,
@@ -42,7 +43,7 @@ filter_map = {
 class BookCollection(Resource):
 
     @api.expect(args_parser, validate=True)
-    @api.response(200, "OK", get_swagger_model(api, PaginatedBookSchema))
+    @api.response(200, "OK")
     def get(self):
         args = args_parser.parse_args()
         page = args.pop('page')
@@ -52,7 +53,7 @@ class BookCollection(Resource):
 
 
 class BookItem(Resource):
-    @api.response(200, "OK", get_swagger_model(api, BookSchema))
+    @api.response(200, "OK")
     def get(self, id, **kwargs):
         book = Book.query.get(id)
         return BookSchema().dump(book), HTTPStatus.OK
