@@ -24,7 +24,7 @@ requirements = [
     "itsdangerous==1.1.0",
     "Jinja2==2.10.3",
     "jsonschema==3.2.0",
-    "lxml==4.4.2",
+    "lxml==4.6.2",
     "Mako==1.1.0",
     "MarkupSafe==1.1.1",
     "marshmallow==3.3.0",
