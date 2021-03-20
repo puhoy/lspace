@@ -22,7 +22,7 @@ requirements = [
     "idna==2.8",
     "isbnlib==3.9.10",
     "itsdangerous==1.1.0",
-    "Jinja2==2.10.3",
+    "Jinja2==2.11.3",
     "jsonschema==3.2.0",
     "lxml==4.4.2",
     "Mako==1.1.0",
