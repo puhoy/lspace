@@ -34,7 +34,7 @@ requirements = [
     "python-editor==1.0.4",
     "python-slugify==4.0.0",
     "pytz==2019.3",
-    "PyYAML==5.2",
+    "PyYAML==5.4",
     "requests==2.22.0",
     "six==1.13.0",
     "SQLAlchemy==1.3.12",
