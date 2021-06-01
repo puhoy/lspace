@@ -40,7 +40,7 @@ requirements = [
     "SQLAlchemy==1.3.12",
     "text-unidecode==1.3",
     "typing==3.7.4.1",
-    "urllib3==1.25.7",
+    "urllib3==1.26.5",
     "Werkzeug==0.16.0",
     "Whoosh==2.7.4",
     "WTForms==2.2.1",
