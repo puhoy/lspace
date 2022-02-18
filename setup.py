@@ -19,7 +19,7 @@ requirements = [
     "Flask-WTF==1.0.0",
     "gunicorn==20.1.0",
     "html2text==2020.1.16",
-    "idna==2.8",
+    "idna==3.3",
     "isbnlib==3.10.9",
     "itsdangerous==2.0.1",
     "Jinja2==3.0.3",
