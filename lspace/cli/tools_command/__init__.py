@@ -14,8 +14,8 @@ def tools():
     pass
 
 
-from lspace.cli.tools_command.clear_cache import _clear_cache
-from lspace.cli.tools_command.rebuild_search_index import _rebuild_search_index
+from lspace.cli.tools_command.clear_cache import clear_cache
+from lspace.cli.tools_command.rebuild_search_index import rebuild_search_index
 from lspace.cli.tools_command.update_paths import _update_paths
 
 

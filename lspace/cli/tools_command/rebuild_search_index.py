@@ -7,5 +7,5 @@ logger = logging.getLogger(__name__)
 
 
 @tools.command(help='rebuild the search index for your library')
-def _rebuild_search_index():
+def rebuild_search_index():
     whooshee.reindex()

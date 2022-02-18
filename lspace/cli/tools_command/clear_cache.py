@@ -9,7 +9,7 @@ from lspace.models.meta_cache import MetaCache
 logger = logging.getLogger(__name__)
 
 @tools.command(help='clear metadata cache')
-def _clear_cache():
+def clear_cache():
     num = MetaCache.query.delete()
     db.session.commit()
     click.echo('deleted %s rows' % num)
