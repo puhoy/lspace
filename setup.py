@@ -56,6 +56,7 @@ test_requirements = [
 dev_requirements = test_requirements + [
     "ipython==8.0.1",
     "doit==0.34.1",
+    "wheel==0.37.1",
 ]
 
 setup(
