@@ -1,4 +1,4 @@
-from flask_restplus import Resource
+from flask_restx import Resource
 
 from flask import send_file
 from lspace.models import Book

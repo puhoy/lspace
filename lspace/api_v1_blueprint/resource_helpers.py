@@ -1,6 +1,6 @@
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
-from flask_restplus import reqparse
+from flask_restx import reqparse
 from marshmallow import Schema, fields
 
 

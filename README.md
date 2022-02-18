@@ -155,7 +155,7 @@ this also gives you the import command for your current search results!
 #### 2. make a virtualenv and activate it
 
 ```
-virtualenv  env --python=python
+python -m venv env
 
 source env/bin/activate  # for bash
 

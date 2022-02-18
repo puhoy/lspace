@@ -9,7 +9,7 @@ from lspace.models import Book, Author
 
 def _fetch_isbn_meta(isbn, service):
     try:
-        meta = isbnlib.meta(isbn, service=service, cache='default')
+        meta = isbnlib.meta(isbn, service=service)
     except (isbnlib.dev._exceptions.NoDataForSelectorError,
             isbnlib._exceptions.NotValidISBNError,
             isbnlib.dev._exceptions.DataNotFoundAtServiceError

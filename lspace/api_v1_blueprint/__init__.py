@@ -1,5 +1,5 @@
 from flask import Blueprint
-from flask_restplus import Api
+from flask_restx import Api
 
 api_blueprint = Blueprint('api', __name__,
                           template_folder='templates')

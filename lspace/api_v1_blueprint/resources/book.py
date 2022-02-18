@@ -1,5 +1,5 @@
-from flask_restplus import Resource
-from flask_restplus._http import HTTPStatus
+from flask_restx import Resource
+from flask_restx._http import HTTPStatus
 
 from lspace.api_v1_blueprint import api
 from lspace.api_v1_blueprint.models import BookSchema, PaginatedBookSchema
