@@ -3,7 +3,7 @@ import os
 
 from flask import current_app
 from slugify import slugify
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
 from lspace import db, whooshee
@@ -30,6 +30,8 @@ class Book(db.Model):
 
     md5sum = Column(String(32))
     path = Column(String(400))
+
+    is_external_path = Column(Boolean())
 
     metadata_source = Column(String(20), default='')
 
@@ -62,6 +64,9 @@ class Book(db.Model):
     @property
     def full_path(self):
         # type: () -> str
+        if self.is_external_path:
+            return self.path
+
         library_path = current_app.config['USER_CONFIG']['library_path']
         return os.path.expanduser(os.path.join(library_path, self.path))
 
