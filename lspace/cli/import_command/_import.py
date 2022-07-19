@@ -1,5 +1,5 @@
 import logging
-from pathlib import PurePath
+from pathlib import PurePath, Path
 from urllib.parse import urlparse
 
 import click
@@ -54,35 +54,40 @@ def is_api(url):
     return False
 
 
-def import_wizard(path, skip_library_check, move):
-    # type: (str, bool, bool) -> Union[Book, None]
+def import_wizard(path, skip_library_check, move, inplace):
+    # type: (str, bool, bool, bool) -> Union[Book, None]
     click.echo(bold('importing ') + path)
 
     if is_calibre_library(path):
         if click.confirm('this looks like a calibre library - import?', default=True):
             calibre_importer = CalibreWrapper(path)
             for book_path, book in calibre_importer.import_books():
-                import_file_wizard(book_path, skip_library_check, move, metadata=[book])
+                import_file_wizard(book_path, skip_library_check, move, inplace, metadata=[book])
             return
 
     if is_api(path):
         if click.confirm('this looks like the lspace api - import?', default=True):
             api_importer = ApiImporter(path)
             for book_path, book in api_importer.start_import(skip_library_check=skip_library_check):
-                import_file_wizard(book_path, skip_library_check, move=False, metadata=[book])
+                import_file_wizard(book_path, skip_library_check, move=False, inplace=False, metadata=[book])
         return
 
-    return import_file_wizard(path, skip_library_check, move)
+    return import_file_wizard(path, skip_library_check, move, inplace)
 
 
-def import_file_wizard(path, skip_library_check, move, metadata=None):
-    # type: (str, bool, bool, List[Book]) -> Union[Book, None]
+def import_file_wizard(path, skip_library_check, move, inplace, metadata=None):
+    # type: (str, bool, bool, bool, List[Book]) -> Union[Book, None]
+
+    abspath = Path(path).resolve()
+    if not abspath.exists():
+        logger.error(f"cannot find file at {abspath}, skipping")
+        return
 
     try:
-        file_type_object = get_file_type_object(path)
+        file_type_object = get_file_type_object(abspath)
     except Exception as e:
-        logger.exception('error reading {path}'.format(path=path), exc_info=True)
-        click.secho('error reading {path}'.format(path=path), fg='red')
+        logger.exception('error reading {path}'.format(path=abspath), exc_info=True)
+        click.secho('error reading {path}'.format(path=abspath), fg='red')
         return
 
     if not file_type_object:
@@ -91,7 +96,7 @@ def import_file_wizard(path, skip_library_check, move, metadata=None):
         return
 
     if not skip_library_check and Book.query.filter_by(md5sum=file_type_object.get_md5()).first():
-        click.echo(bold('already imported') + ', skipping' + path)
+        click.echo(bold('already imported') + ', skipping ' + path)
         return
 
     if not metadata:
@@ -113,9 +118,10 @@ def import_file_wizard(path, skip_library_check, move, metadata=None):
         # but one of the strings mapped to functions
 
         function_that_gets_new_choices = other_choices.get(choice)['function']
-        isbns_with_metadata = function_that_gets_new_choices(file_type_object=file_type_object,
-                                                             old_choices=isbns_with_metadata,
-                                                             )
+        isbns_with_metadata = function_that_gets_new_choices(
+            file_type_object=file_type_object,
+            old_choices=isbns_with_metadata,
+        )
 
         if isbns_with_metadata is not False:
             choice = choose_result(file_type_object, isbns_with_metadata)
@@ -124,7 +130,7 @@ def import_file_wizard(path, skip_library_check, move, metadata=None):
             choice = False
 
     if choice:
-        book = _import(file_type_object, choice, move)
+        book = _import(file_type_object, choice, move, inplace)
         return book
     else:
         click.echo('skipping %s' % file_type_object.filename, color='yellow')
@@ -203,11 +209,11 @@ def similar_books_decide_import(book_choice):
     return True
 
 
-def _import(file_type_object, book_choice, move_file):
-    # type: (FileTypeBase, Book, bool) -> Union[Book, None]
+def _import(file_type_object, book_choice, move_file, inplace):
+    # type: (FileTypeBase, Book, bool, bool) -> Union[Book, None]
     logger.debug('importing %s, %s' % (file_type_object, book_choice))
     logger.debug(file_type_object)
-    
+
     book_choice.path = file_type_object.path
 
     do_import = similar_books_decide_import(book_choice)
@@ -217,10 +223,16 @@ def _import(file_type_object, book_choice, move_file):
 
     add_to_shelf(book_choice)
 
-    path_in_library = copy_to_library(file_type_object.path, book_choice, move_file)
-    if path_in_library:
-        book = add_book_to_db(file_type_object, book_choice, path_in_library)
-        click.secho('imported %s - %s' % (book.authors_names, book.title), fg='green')
-        return book
+    if inplace:
+        book = add_book_to_db(file_type_object, book_choice, file_type_object.path, is_external_path=True)
+
     else:
-        click.secho('could not import %s' % file_type_object.path, fg='red')
+        path_in_library = copy_to_library(file_type_object.path, book_choice, move_file)
+        if path_in_library:
+            book = add_book_to_db(file_type_object, book_choice, path_in_library, is_external_path=False)
+        else:
+            click.secho('could not import %s' % file_type_object.path, fg='red')
+            return None
+
+    click.secho('imported %s - %s' % (book.authors_names, book.title), fg='green')
+    return book

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from ._base import FileTypeBase
 from .pdf import PDF
@@ -11,11 +12,11 @@ mapping = {
 
 
 def get_file_type_object(path):
-    # type: (str) -> FileTypeBase
-    filename, file_extension = os.path.splitext(path)
+    # type: (Path) -> FileTypeBase
+    file_extension = path.suffix
 
     file_class = mapping.get(file_extension, None)
     if file_class:
-        return file_class(path)
+        return file_class(str(path))
     else:
         return None

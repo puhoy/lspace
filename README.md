@@ -87,6 +87,10 @@ the default field names, in case nothing is specified in import
 
 `lspace import path/to/folder/*`
 
+if you already have a folder you are happy with and, for example, just want to use it to serve your books or search through your files, you can add the `--inplace` switch on import, which will not copy them over to your library folder, but instead keep the book as an "external" reference.
+
+`lspace import --inplace path/to/ebook.epub`
+
 #### import from calibre library
 
 `lspace import path/to/calibre_library/metadata.db`
@@ -166,7 +170,7 @@ source env/bin/activate  # for bash
 #### 3. install requirements
 
 ```
-    pip install  -e .[dev]
+pip install  -e .[dev]
 ```
 
 #### 4. set up a separate config to not mess up your regular installation
@@ -180,6 +184,7 @@ sed -i 's/lspace\/lspace.db/lspace_dev\/lspace.db/g' ~/.config/lspace_dev/config
 sed -i 's/~\/library/~\/library_dev/g' ~/.config/lspace_dev/config.yml
 
 # also, if you want, set the loglevel to something else
+
 ``` 
     
 after this, just set LSPACE_CONFIG to your new config file before you start to try new stuff
@@ -189,6 +194,16 @@ export LSPACE_CONFIG=~/.config/lspace_dev/config.yml  # bash
 set -gx LSPACE_CONFIG ~/.config/lspace_dev/config.yml  # fish 
 ```
 
+#### migrations
+
+the db command is available when running in dev mode.
+
+create a new migration with `LSPACE_DEV=1 lspace db migrate`
+
+afterwards, running any lspace command will automatically update the database
+
+
 ## why "L-space"?
 
 its named after discworlds [library-space](https://en.wikipedia.org/wiki/List_of_dimensions_of_the_Discworld#L-space) dimension :)
+
