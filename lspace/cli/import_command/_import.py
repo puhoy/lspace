@@ -96,7 +96,7 @@ def import_file_wizard(path, skip_library_check, move, inplace, metadata=None):
         return
 
     if not skip_library_check and Book.query.filter_by(md5sum=file_type_object.get_md5()).first():
-        click.echo(bold('already imported') + ', skipping' + path)
+        click.echo(bold('already imported') + ', skipping ' + path)
         return
 
     if not metadata:
