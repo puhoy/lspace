@@ -7,7 +7,7 @@ from lspace.models import Book
 logger = logging.getLogger(__name__)
 
 
-def add_book_to_db(file_type_object, result, path_in_library, is_external_path):
+def add_book_to_db(file_type_object, result, file_path, is_external_path):
     # type: (FileTypeBase, Book, str, bool) -> Book
     """
 
@@ -18,7 +18,7 @@ def add_book_to_db(file_type_object, result, path_in_library, is_external_path):
     """
 
     result.md5sum = file_type_object.get_md5()
-    result.path = path_in_library
+    result.path = file_path
     result.is_external_path = is_external_path
 
     logger.info('adding book %s' % result.to_dict())

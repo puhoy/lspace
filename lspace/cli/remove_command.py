@@ -18,6 +18,16 @@ def remove(query):
         click.echo('{result.authors_names} - {result.title}'.format(result=result))
         click.echo('{result.full_path}'.format(result=result))
         if click.confirm('delete this book from library?'):
-            os.unlink(result.full_path)
-            db.session.delete(result)
-            db.session.commit()
+            if result.is_external_path:
+                if click.confirm(f'this file is not part of the library - should i try to delete the file at "{result.full_path}"?'):
+                    os.unlink(result.full_path)
+                    db.session.delete(result)
+                    db.session.commit()
+                else:
+                    click.echo("deleting metadata only...")
+                    db.session.delete(result)
+                    db.session.commit()
+            else:
+                os.unlink(result.full_path)
+                db.session.delete(result)
+                db.session.commit()

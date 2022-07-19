@@ -1,5 +1,5 @@
 import logging
-from pathlib import PurePath
+from pathlib import PurePath, Path
 from urllib.parse import urlparse
 
 import click
@@ -78,11 +78,16 @@ def import_wizard(path, skip_library_check, move, inplace):
 def import_file_wizard(path, skip_library_check, move, inplace, metadata=None):
     # type: (str, bool, bool, bool, List[Book]) -> Union[Book, None]
 
+    abspath = Path(path).resolve()
+    if not abspath.exists():
+        logger.error(f"cannot find file at {abspath}, skipping")
+        return
+
     try:
-        file_type_object = get_file_type_object(path)
+        file_type_object = get_file_type_object(abspath)
     except Exception as e:
-        logger.exception('error reading {path}'.format(path=path), exc_info=True)
-        click.secho('error reading {path}'.format(path=path), fg='red')
+        logger.exception('error reading {path}'.format(path=abspath), exc_info=True)
+        click.secho('error reading {path}'.format(path=abspath), fg='red')
         return
 
     if not file_type_object:
