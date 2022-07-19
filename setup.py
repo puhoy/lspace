@@ -28,7 +28,7 @@ requirements = [
     "Mako==1.1.0",
     "MarkupSafe==2.0.1",
     "marshmallow==3.14.1",
-    "PyPDF2==1.26.0",
+    "PyPDF2==1.27.5",
     "pyrsistent==0.15.6",
     "python-dateutil==2.8.1",
     "python-editor==1.0.4",
