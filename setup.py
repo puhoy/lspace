@@ -58,6 +58,7 @@ dev_requirements = test_requirements + [
     "doit==0.34.1",
     "wheel==0.37.1",
     "twine==3.8.0"
+    "build==0.8.0"
 ]
 
 setup(

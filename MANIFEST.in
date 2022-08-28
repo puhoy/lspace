@@ -1,5 +1,4 @@
 
-include lspace/config/default_conf.yaml
 include README.md
 recursive-include lspace/migrations *
 recursive-include lspace/frontend_blueprint/templates *

@@ -4,7 +4,7 @@ from doit.tools import PythonInteractiveAction
 def task_build():
     return {
         'targets': ['build', 'dist', 'lspace.egg-info', '.pytest_cache', 'htmlcov'],
-        'actions': ['rm -fr %(targets)s', 'python3 setup.py sdist'],
+        'actions': ['rm -fr %(targets)s', 'python3 -m build'],
         'clean': ['rm -fr %(targets)s'],
         'verbosity': 2
     }
