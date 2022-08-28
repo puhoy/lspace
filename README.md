@@ -203,6 +203,13 @@ create a new migration with `LSPACE_DEV=1 lspace db migrate`
 afterwards, running any lspace command will automatically update the database
 
 
+#### making a release
+
+commands to build, test-release and release are wrapped in a `doit` script `dodo.py`.
+
+bumping is requires bump2version, twine is used for uploading to pypi.
+
+
 ## why "L-space"?
 
 its named after discworlds [library-space](https://en.wikipedia.org/wiki/List_of_dimensions_of_the_Discworld#L-space) dimension :)

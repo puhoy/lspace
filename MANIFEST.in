@@ -4,3 +4,5 @@ include README.md
 recursive-include lspace/migrations *
 recursive-include lspace/frontend_blueprint/templates *
 recursive-include lspace/frontend_blueprint/static *
+global-exclude __pycache__
+global-exclude *.py[co]
