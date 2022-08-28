@@ -1,6 +1,6 @@
 import flask
 
-__version__ = '0.4.4'
+__version__ = '0.4.5'
 
 import logging
 import os
