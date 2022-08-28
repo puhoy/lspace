@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 requirements = [
-    "alembic==1.3.2",
+    "alembic==1.8.1",
     "aniso8601==8.0.0",
     "apispec==3.1.1",
     "attrs==19.3.0",
