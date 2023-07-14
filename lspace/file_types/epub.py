@@ -12,7 +12,9 @@ class Epub(FileTypeBase):
 
     def __init__(self, path):
         super().__init__(path)
-        self.book = epub.read_epub(path)
+        # todo: ignore_ncx will default to true in next version,
+        # throws warning if not set
+        self.book = epub.read_epub(path, options=dict(ignore_ncx=True))
 
     def get_text(self):
         # type: () -> [str]

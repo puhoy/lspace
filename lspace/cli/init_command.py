@@ -4,10 +4,10 @@ import click
 import yaml
 
 from lspace.helpers import get_default_config
-from lspace.cli import cli
+from lspace.cli import cli_bp
 
 
-@cli.command(help='generate a new config')
+@cli_bp.cli.command(help='generate a new config')
 def init():
     from flask import current_app
 

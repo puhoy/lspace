@@ -1,8 +1,9 @@
 import os
 
-from flask.cli import AppGroup
+#from flask.cli import AppGroup
+from flask import Blueprint
 
-cli = AppGroup('cli')
+cli_bp = Blueprint('cli', __name__, cli_group=None)
 
 from .import_command import import_command
 from .init_command import init

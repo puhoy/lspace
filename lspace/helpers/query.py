@@ -1,7 +1,6 @@
 import isbnlib
 from typing import List
 
-from lspace import db
 from lspace.helpers import logger
 from lspace.models.meta_cache import MetaCache
 from lspace.models import Book, Author
@@ -21,6 +20,7 @@ def _fetch_isbn_meta(isbn, service):
     return meta
 
 def _get_metadata_for_isbn(isbn, service='openl'):
+    from lspace.helpers.create_app import db
     # type: (str, str) -> Book
     cached_meta = MetaCache.query.filter_by(isbn=isbn, service=service).first()
     if cached_meta:

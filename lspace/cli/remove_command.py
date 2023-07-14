@@ -1,12 +1,12 @@
 import os
 import click
 
-from lspace.cli import cli
+from lspace.cli import cli_bp
 from lspace.helpers.query import query_db
 from lspace import db
 
 
-@cli.command(help='remove books from library')
+@cli_bp.cli.command(help='remove books from library')
 @click.argument('query', nargs=-1)
 def remove(query):
     if not query:

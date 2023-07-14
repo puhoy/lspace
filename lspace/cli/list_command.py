@@ -1,10 +1,10 @@
 import click
 
-from lspace.cli import cli
+from lspace.cli import cli_bp
 from lspace.helpers.query import query_db
 
 
-@cli.command(name='list', help='query your database')
+@cli_bp.cli.command(name='list', help='query your database')
 @click.argument('query', nargs=-1)
 @click.option('--path', is_flag=True)
 @click.option('--details', is_flag=True)

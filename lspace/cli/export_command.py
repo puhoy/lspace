@@ -7,14 +7,14 @@ import click
 from slugify import slugify
 
 from flask import current_app
-from lspace.cli import cli
+from lspace.cli import cli_bp
 from lspace.cli.import_command.copy_to_library import find_unused_path
 from lspace.helpers.query import query_db
 
 logger = logging.getLogger(__name__)
 
 
-@cli.command(help='export books to a folder - this uses ebook-convert, which is part of calibre')
+@cli_bp.cli.command(help='export books to a folder - this uses ebook-convert, which is part of calibre')
 @click.argument('query', nargs=-1)
 @click.argument('export_path')
 @click.option('--format')

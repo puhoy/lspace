@@ -1,12 +1,12 @@
 import click
 
 from lspace.cli.import_command import import_wizard
-from lspace.cli import cli
+from lspace.cli import cli_bp
 from lspace import db
 from lspace.helpers.query import query_db
 
 
-@cli.command(help='reimport books in library')
+@cli_bp.cli.command(help='reimport books in library')
 @click.argument('query', nargs=-1)
 def reimport(query):
     if not query:

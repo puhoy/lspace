@@ -1,9 +1,9 @@
-from . import cli
+from . import cli_bp
 
 from flask_migrate import init, migrate, upgrade
 
 
-@cli.group()
+@cli_bp.cli.group()
 def db():
     pass
 

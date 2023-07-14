@@ -1,8 +1,8 @@
-# L-Space
+# l-space
 
 a cli ebook manager built around [isbnlib](https://github.com/xlcnd/isbnlib)
 
-when importing it tries to find isbns in the files metadata and in the text. 
+on import, lspace tries to find isbns in the files metadata and in the text. 
 with the isbn it tries to fetch metadata about the book from google books and openlibrary. 
 if no isbn is found, it queries metadata based on the filename.
 

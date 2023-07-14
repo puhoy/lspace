@@ -4,12 +4,12 @@ import click
 import isbnlib
 import yaml
 
-from lspace.cli import cli
+from lspace.cli import cli_bp
 
 logger = logging.getLogger(__name__)
 
 
-@cli.group(help='tools you probably never need... :P')
+@cli_bp.cli.group(help='tools you probably never need... :P')
 def tools():
     pass
 
