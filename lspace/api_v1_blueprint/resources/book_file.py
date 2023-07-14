@@ -12,7 +12,7 @@ class BookFile(Resource):
 
     def get(self, md5sum, **kwargs):
         book = Book.query.filter_by(md5sum=md5sum).first()
-        attachment_filename = '{authors_slug}-{title_slug}{extension}'.format(
+        download_name = '{authors_slug}-{title_slug}{extension}'.format(
             authors_slug=book.author_names_slug,
             title_slug=book.title_slug,
             extension=book.extension
@@ -20,4 +20,4 @@ class BookFile(Resource):
         logger.debug(f"sending {book.full_path}")
         return send_file(book.full_path,
                          as_attachment=True,
-                         attachment_filename=attachment_filename)
+                         download_name=download_name)

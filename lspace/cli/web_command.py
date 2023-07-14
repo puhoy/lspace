@@ -15,20 +15,19 @@ from lspace.frontend_blueprint import frontend_blueprint
 @click.option('--host', default='0.0.0.0')
 @click.option('--debug', default=False, is_flag=True)
 def web(host, port, debug):
-    with current_app as app:
-        app.register_blueprint(api_blueprint, url_prefix='/api/v1')
-        app.register_blueprint(frontend_blueprint, url_prefix='')
-    
-        # todo: flask_env removed in 2.3.0
-        if (os.environ.get('LSPACE_DEV', None) == '1') or debug:
-            os.environ['FLASK_ENV'] = 'development'
-            print(os.environ['FLASK_ENV'])
-            app.run(debug=True, host=host, port=port)
-        else:
-            options = {
-                'bind': '{HOST}:{PORT}'.format(HOST=host, PORT=port)
-            }
-            StandaloneApplication(app, options).run()
+    current_app.register_blueprint(api_blueprint, url_prefix='/api/v1')
+    current_app.register_blueprint(frontend_blueprint, url_prefix='')
+
+    # todo: flask_env removed in 2.3.0
+    if (os.environ.get('LSPACE_DEV', None) == '1') or debug:
+        os.environ['FLASK_ENV'] = 'development'
+        print(os.environ['FLASK_ENV'])
+        current_app.run(debug=True, host=host, port=port)
+    else:
+        options = {
+            'bind': '{HOST}:{PORT}'.format(HOST=host, PORT=port)
+        }
+        StandaloneApplication(current_app, options).run()
 
 
 # http://docs.gunicorn.org/en/latest/custom.html

@@ -10,9 +10,9 @@ class PDF(FileTypeBase):
     def __init__(self, path):
         super().__init__(path)
 
-        self.pdf_reader = pypdf.PdfFileReader(self.path)
-        self.metadata = self.pdf_reader.getDocumentInfo()
-        self.xmp_metadata = self.pdf_reader.getXmpMetadata()
+        self.pdf_reader = pypdf.PdfReader(self.path)
+        self.metadata = self.pdf_reader.metadata
+        self.xmp_metadata = self.pdf_reader.xmp_metadata
 
     def get_text(self):
         # type: () -> [str]
