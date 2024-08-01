@@ -66,7 +66,7 @@ setup(
     name='lspace',
     packages=find_packages(),
     include_package_data=True,
-    version='0.4.7',
+    version='0.4.8',
     entry_points={
         'console_scripts': [
             'lspace=lspace:cli'
