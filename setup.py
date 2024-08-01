@@ -9,7 +9,7 @@ requirements = [
     "certifi==2023.5.7",
     "chardet==5.1.0",
     "Click==8.1.4",
-    "colorama==version='version='0.4.7''",
+    "colorama==0.4.6",
     "EbookLib==0.18",
     "Flask==2.3.2",
     "Flask-Migrate==4.0.4",
@@ -66,7 +66,7 @@ setup(
     name='lspace',
     packages=find_packages(),
     include_package_data=True,
-    version='version='version='0.4.7''',
+    version='0.4.7',
     entry_points={
         'console_scripts': [
             'lspace=lspace:cli'
