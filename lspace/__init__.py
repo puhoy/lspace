@@ -1,4 +1,4 @@
-__version__ = '__version__ = '0.4.6''
+__version__ = '__version__ = '__version__ = '0.4.6'''
 
 import os
 os.environ['FLASK_APP'] = os.path.join(os.path.dirname(__file__), 'app.py')
