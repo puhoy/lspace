@@ -57,7 +57,7 @@ dev_requirements = test_requirements + [
     "ipython==8.14.0",
     "doit==0.36.0",
     "wheel==0.40.0",
-    "twine==4.0.2",
+    "twine==5.1.1",
     "build==0.10.0",
     "bump2version==1.0.1"
 ]
