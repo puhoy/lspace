@@ -158,7 +158,7 @@ this also gives you the import command for your current search results!
 
 #### 2. make a virtualenv and activate it
 
-```
+```bash
 python -m venv env
 
 source env/bin/activate  # for bash
@@ -169,13 +169,13 @@ source env/bin/activate  # for bash
 
 #### 3. install requirements
 
-```
+```bash
 pip install  -e .[dev]
 ```
 
 #### 4. set up a separate config to not mess up your regular installation
 
-```
+```bash
 # initialize a new config file at a separate path
 LSPACE_CONFIG=~/.config/lspace_dev/config.yml lspace init
 
@@ -185,11 +185,11 @@ sed -i 's/~\/library/~\/library_dev/g' ~/.config/lspace_dev/config.yml
 
 # also, if you want, set the loglevel to something else
 
-``` 
+```
     
 after this, just set LSPACE_CONFIG to your new config file before you start to try new stuff
 
-```
+```bash
 export LSPACE_CONFIG=~/.config/lspace_dev/config.yml  # bash
 set -gx LSPACE_CONFIG ~/.config/lspace_dev/config.yml  # fish 
 ```
