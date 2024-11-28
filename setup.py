@@ -6,7 +6,7 @@ requirements = [
     "apispec==6.3.0",
     "attrs==23.1.0",
     "blinker==1.6.2",
-    "certifi==2023.5.7",
+    "certifi==2023.7.22",
     "chardet==5.1.0",
     "Click==8.1.4",
     "colorama==0.4.6",
